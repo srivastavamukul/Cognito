@@ -24,7 +24,7 @@ const MainContent: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 h-full overflow-hidden bg-gray-900">
+    <div className="flex-1 h-full overflow-hidden bg-transparent">
       <div key={activeTool} className="h-full animate-fadeIn">
         {renderContent()}
       </div>

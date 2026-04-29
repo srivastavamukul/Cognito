@@ -1,3 +1,19 @@
 backend/.env
 backend/node_modules
 frontend/.env
+memory.md
+primary.md
+design.md
+implementation.md
+improvements.md
+cognito_premium_dashboard/
+cognito_premium_landing_page/
+cognito_solarpunk_dark/
+premium_study_assistant/
+stitch_cognito_premium_dark_redesign (1)/
+frontend/node_modules
+CHANGELOG.md
+dist/
+**/node_modules
+.env
+.DS_Store

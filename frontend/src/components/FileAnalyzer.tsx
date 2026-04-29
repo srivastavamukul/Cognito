@@ -112,16 +112,16 @@ const FileAnalyzer: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-6">
-      <h2 className="text-2xl font-bold text-white mb-6">File Analyzer</h2>
+    <div className="flex flex-col h-full p-8 max-w-5xl mx-auto overflow-y-auto">
+      <h2 className="font-headline-lg text-headline-lg text-on-surface mb-8 text-center">File Analyzer</h2>
 
       {/* Drop zone */}
-      <div className="max-w-3xl">
+      <div className="max-w-3xl w-full mx-auto">
         <div
-          className={`border-2 border-dashed rounded-xl p-8 text-center mb-6 transition-all duration-200 ${
+          className={`glass-panel rounded-3xl p-10 text-center mb-8 transition-all duration-300 border-2 ${
             dragActive
               ? 'border-indigo-500 bg-indigo-500/10'
-              : 'border-gray-700 hover:border-gray-600'
+              : 'border-transparent hover:border-white/10 hover:bg-white/5'
           }`}
           onDragEnter={handleDrag}
           onDragOver={handleDrag}
@@ -135,45 +135,47 @@ const FileAnalyzer: React.FC = () => {
             className="hidden"
             onChange={handleFileChange}
           />
-          <Upload className="w-10 h-10 mx-auto mb-4 text-gray-500" />
-          <p className="text-gray-300 mb-1">Drag and drop your CSV file here, or</p>
-          <p className="text-gray-500 text-sm mb-4">Supports .csv files with student performance data</p>
+          <div className="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center mx-auto mb-4">
+            <span className="material-symbols-outlined text-3xl text-indigo-400">upload_file</span>
+          </div>
+          <p className="font-body-md text-on-surface mb-2 text-lg">Drag and drop your CSV file here, or</p>
+          <p className="text-zinc-500 text-sm mb-6">Supports .csv files with student performance data</p>
           <button
-            className="px-5 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-colors text-sm font-medium"
+            className="luminescent-button px-6 py-3 text-white rounded-full transition-colors text-sm font-label-md"
             onClick={() => fileInputRef.current?.click()}
           >
             Browse Files
           </button>
         </div>
 
-        {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
+        {error && <p className="text-red-400 text-sm mb-6 text-center">{error}</p>}
 
         {/* Selected file */}
         {selectedFile && (
-          <div className="bg-gray-800 rounded-xl p-4 mb-6 animate-fadeIn">
+          <div className="glass-card rounded-3xl p-6 mb-8 animate-fadeIn max-w-xl mx-auto">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-                  <File className="text-indigo-400" size={20} />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-indigo-400">csv</span>
                 </div>
                 <div>
-                  <p className="text-white font-medium text-sm">{selectedFile.name}</p>
-                  <p className="text-gray-500 text-xs">{formatFileSize(selectedFile.size)}</p>
+                  <p className="text-on-surface font-label-md">{selectedFile.name}</p>
+                  <p className="text-zinc-500 text-sm">{formatFileSize(selectedFile.size)}</p>
                 </div>
               </div>
-              <button className="text-gray-500 hover:text-gray-300 transition-colors" onClick={removeFile}>
-                <X size={18} />
+              <button className="text-zinc-500 hover:text-rose-400 transition-colors p-2" onClick={removeFile}>
+                <span className="material-symbols-outlined text-xl">close</span>
               </button>
             </div>
 
             <button
-              className="w-full mt-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 transition-all duration-200 flex items-center justify-center gap-2 text-sm font-medium shadow-lg shadow-indigo-600/20"
+              className="w-full mt-6 py-3 luminescent-button text-white rounded-full transition-all duration-200 flex items-center justify-center gap-2 font-label-md"
               onClick={handleAnalyze}
               disabled={analyzing}
             >
               {analyzing ? (
                 <>
-                  <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                  <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
                   Analyzing...
                 </>
               ) : (
@@ -186,16 +188,15 @@ const FileAnalyzer: React.FC = () => {
 
       {/* Empty state */}
       {analysisResults.length === 0 && !selectedFile && (
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center py-10">
           <div className="text-center max-w-md">
             <div className="relative inline-block mb-6">
-              <div className="w-20 h-20 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-                <FileText className="w-10 h-10 text-emerald-400" />
+              <div className="w-24 h-24 rounded-full glass-panel flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.1)]">
+                <span className="material-symbols-outlined text-5xl text-emerald-400" style={{ fontVariationSettings: "'FILL' 1" }}>analytics</span>
               </div>
-              <div className="absolute inset-0 w-20 h-20 rounded-2xl bg-emerald-500/10 pulse-ring" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Analyze Your Performance</h3>
-            <p className="text-gray-500 text-sm">
+            <h3 className="font-headline-md text-on-surface mb-3 text-xl">Analyze Your Performance</h3>
+            <p className="text-zinc-400 font-body-md">
               Upload a CSV file with your test results. The AI will identify your weak topics so you know exactly what to study next.
             </p>
           </div>
@@ -204,28 +205,28 @@ const FileAnalyzer: React.FC = () => {
 
       {/* Results */}
       {analysisResults.length > 0 && (
-        <div className="flex-1 overflow-y-auto mt-4">
-          <h3 className="text-lg font-semibold text-white mb-4">Analysis Results</h3>
+        <div className="flex-1 mt-8 max-w-5xl w-full mx-auto">
+          <h3 className="font-headline-md text-on-surface mb-6 text-xl px-2">Analysis Insights</h3>
 
-          <div className="space-y-4 max-w-3xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {analysisResults.map((result) => (
-              <div key={result.id} className="bg-gray-800 rounded-xl p-4 animate-fadeIn">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-                    <File className="text-indigo-400" size={20} />
+              <div key={result.id} className="glass-card rounded-3xl p-6 animate-fadeIn hover:-translate-y-1 transition-transform duration-300">
+                <div className="flex items-center gap-4 mb-4 border-b border-white/5 pb-4">
+                  <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-indigo-400">insert_drive_file</span>
                   </div>
                   <div>
-                    <p className="text-white font-medium text-sm">{result.fileName}</p>
-                    <p className="text-gray-500 text-xs">{result.fileType} - {result.fileSize}</p>
+                    <p className="text-on-surface font-label-md text-base">{result.fileName}</p>
+                    <p className="text-zinc-500 text-xs mt-1">{result.fileType} • {result.fileSize}</p>
                   </div>
                 </div>
 
-                <div className="bg-gray-900 rounded-lg p-3 text-gray-300 text-sm">
-                  <span className="text-gray-500 font-medium">Weak Topics: </span>
+                <div className="glass-panel rounded-2xl p-4 text-zinc-300 font-body-md text-sm leading-relaxed">
+                  <span className="text-emerald-400 font-semibold block mb-2">Needs Attention:</span>
                   {result.analysisData}
                 </div>
 
-                <p className="text-gray-600 text-xs mt-2">
+                <p className="text-zinc-600 text-xs mt-4 px-1">
                   Analyzed on {result.timestamp.toLocaleString()}
                 </p>
               </div>

@@ -1,11 +1,59 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: "class",
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
+        "inverse-primary": "#494bd6",
+        "error-container": "#93000a",
+        "surface-dim": "#141312",
+        "surface-variant": "#363433",
+        "primary-fixed": "#e1e0ff",
+        "outline-variant": "#464554",
+        "on-error": "#690005",
+        "on-primary-fixed-variant": "#2f2ebe",
+        "surface-container-high": "#2b2a28",
+        "background": "#141312",
+        "secondary-fixed": "#ffd6fd",
+        "tertiary": "#89ceff",
+        "surface-container-low": "#1d1b1a",
+        "tertiary-container": "#009ada",
+        "on-tertiary-container": "#002d43",
+        "on-secondary-container": "#ffd8fd",
+        "on-tertiary": "#00344d",
+        "surface-container-highest": "#363433",
+        "primary-container": "#8083ff",
+        "on-tertiary-fixed-variant": "#004c6e",
+        "on-secondary": "#580065",
+        "on-secondary-fixed": "#36003e",
+        "primary-fixed-dim": "#c0c1ff",
+        "tertiary-fixed-dim": "#89ceff",
+        "surface-bright": "#3b3937",
+        "surface": "#141312",
+        "on-primary-fixed": "#07006c",
+        "tertiary-fixed": "#c9e6ff",
+        "inverse-surface": "#e6e1df",
+        "on-secondary-fixed-variant": "#7c008e",
+        "on-primary": "#1000a9",
+        "surface-container": "#211f1e",
+        "primary": "#c0c1ff",
+        "outline": "#908fa0",
+        "surface-tint": "#c0c1ff",
+        "on-surface-variant": "#c7c4d7",
+        "on-surface": "#e6e1df",
+        "on-tertiary-fixed": "#001e2f",
+        "on-error-container": "#ffdad6",
+        "surface-container-lowest": "#0f0e0d",
+        "inverse-on-surface": "#32302f",
+        "on-background": "#e6e1df",
+        "secondary-container": "#ae05c6",
+        "secondary": "#fbabff",
+        "on-primary-container": "#0d0096",
+        "error": "#ffb4ab",
+        "secondary-fixed-dim": "#fbabff",
         gray: {
-          900: '#0F1117',
+          900: '#0A0908',
           800: '#151926',
           700: '#252B3B',
           600: '#384152',
@@ -25,20 +73,50 @@ export default {
           300: '#A5B4FC',
           200: '#C7D2FE',
           100: '#E0E7FF',
+        },
+        orchid: {
+          400: '#da70d6',
+          500: '#ba55d3',
         }
+      },
+      borderRadius: {
+          "DEFAULT": "1rem",
+          "lg": "2rem",
+          "xl": "3rem",
+          "full": "9999px"
+      },
+      spacing: {
+          "container-padding": "48px",
+          "unit": "8px",
+          "section-margin": "80px",
+          "element-gap": "24px",
+          "glass-blur": "40px"
+      },
+      fontFamily: {
+          "body-md": ["Inter"],
+          "label-md": ["Inter"],
+          "body-lg": ["Inter"],
+          "display-xl": ["Inter"],
+          "headline-lg": ["Inter"],
+          "headline-md": ["Inter"]
+      },
+      fontSize: {
+          "body-md": ["16px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+          "label-md": ["14px", { "lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600" }],
+          "body-lg": ["18px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }],
+          "display-xl": ["64px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+          "headline-lg": ["40px", { "lineHeight": "1.2", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+          "headline-md": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }]
       },
       animation: {
         'spin-slow': 'spin 2s linear infinite',
         'bounce-slow': 'bounce 2s infinite',
+        'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
         bounce: {
-          '0%, 100%': {
-            transform: 'translateY(0)',
-          },
-          '50%': {
-            transform: 'translateY(-25%)',
-          },
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-25%)' },
         },
       },
     },

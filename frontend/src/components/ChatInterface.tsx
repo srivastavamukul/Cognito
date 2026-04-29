@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Plus } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import MessageBubble from './MessageBubble';
 import { API_BASE_URL } from '../config';
@@ -8,19 +7,11 @@ const ChatInterface: React.FC = () => {
   const { messages, addMessage, clearMessages, isTyping, setIsTyping } = useApp();
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // Auto-expand textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = Math.min(textareaRef.current.scrollHeight, 160) + 'px';
-    }
-  }, [input]);
+  }, [messages, isTyping]);
 
   const handleSendMessage = async () => {
     if (!input.trim()) return;
@@ -30,7 +21,6 @@ const ChatInterface: React.FC = () => {
     setInput('');
     setIsTyping(true);
 
-    // Build conversation history for context (last 20 messages)
     const conversationHistory = messages
       .filter(m => m.id !== 'welcome')
       .slice(-20)
@@ -61,68 +51,80 @@ const ChatInterface: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Chat header */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-gray-800/60">
-        <h2 className="text-sm font-medium text-gray-400">Chat with Cognito</h2>
+    <div className="flex flex-col h-full relative">
+      {/* Optional: Add a top bar for clear messages if needed. Omitting here for clean UI, or floating it */}
+      <div className="absolute top-4 right-4 z-10">
         <button
           onClick={clearMessages}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
-          aria-label="New chat"
+          className="glass-panel px-4 py-2 rounded-full text-xs text-zinc-400 hover:text-white transition-colors flex items-center gap-2"
         >
-          <Plus size={14} />
-          New Chat
+          <span className="material-symbols-outlined text-sm">delete</span>
+          Clear
         </button>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-3xl mx-auto space-y-4">
-          {messages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
-          ))}
-
-          {isTyping && (
-            <div className="flex items-center gap-3 text-gray-400 animate-pulse">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-xs font-medium">C</span>
-              </div>
-              <div className="flex space-x-1.5 bg-gray-800 px-4 py-3 rounded-2xl">
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-              </div>
+      {/* Chat Container */}
+      <div className="flex-grow overflow-y-auto px-container-padding py-section-margin relative z-0 flex flex-col items-center w-full">
+        <div className="w-full max-w-4xl flex flex-col gap-8 pb-32">
+          {/* Chat Header / Intro */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full glass-panel mb-6 shadow-[0_0_30px_rgba(99,102,241,0.1)]">
+              <span className="material-symbols-outlined text-4xl text-indigo-400" style={{ fontVariationSettings: "'FILL' 1" }}>psychology</span>
             </div>
-          )}
+            <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">AI Brainstorming Session</h2>
+            <p className="font-body-lg text-body-lg text-zinc-400 max-w-2xl mx-auto">Let's synthesize your notes and explore new ideas.</p>
+          </div>
 
-          <div ref={messagesEndRef} />
+          {/* Chat History */}
+          <div className="flex flex-col gap-6 w-full">
+            {messages.map((message) => (
+              <MessageBubble key={message.id} message={message} />
+            ))}
+
+            {isTyping && (
+              <div className="flex gap-6 max-w-[85%] self-start animate-fadeIn w-full">
+                <div className="w-10 h-10 rounded-full glass-panel flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="material-symbols-outlined text-indigo-400 text-sm">auto_awesome</span>
+                </div>
+                <div className="glass-panel message-bubble-ai rounded-2xl rounded-tl-sm p-6 backdrop-blur-[40px] flex items-center space-x-1.5">
+                  <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-orchid-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
       </div>
 
-      {/* Input */}
-      <div className="border-t border-gray-800/60 p-4">
-        <div className="max-w-3xl mx-auto flex items-end gap-3">
-          <textarea
-            ref={textareaRef}
-            className="flex-1 bg-gray-800 text-white rounded-xl px-4 py-3 outline-none resize-none focus:ring-2 focus:ring-indigo-500/50 transition-shadow"
-            placeholder="Type a message..."
-            rows={1}
+      {/* Floating Input Dock */}
+      <div className="absolute bottom-8 left-0 right-0 px-8 flex justify-center z-20 pointer-events-none">
+        <div className="w-full max-w-3xl glass-panel rounded-full p-2 pl-6 flex items-center shadow-[0_10px_40px_rgba(0,0,0,0.3)] pointer-events-auto border border-indigo-500/20 bg-zinc-950/60 transition-all hover:bg-zinc-950/80">
+          <input
+            ref={inputRef}
+            className="flex-grow bg-transparent border-none text-on-surface font-body-md text-body-md focus:ring-0 placeholder-zinc-500 outline-none"
+            placeholder="Explore ideas, ask questions, or paste notes..."
+            type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
           />
-          <button
-            className={`p-3 rounded-xl flex-shrink-0 ${
-              input.trim()
-                ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-600/20'
-                : 'bg-gray-800 text-gray-500 cursor-not-allowed'
-            } transition-all duration-200`}
-            onClick={handleSendMessage}
-            disabled={!input.trim()}
-            aria-label="Send message"
-          >
-            <Send size={18} />
-          </button>
+          <div className="flex items-center gap-2 pr-2">
+            <button className="p-3 rounded-full text-zinc-400 hover:text-indigo-400 hover:bg-white/5 transition-colors">
+              <span className="material-symbols-outlined">attach_file</span>
+            </button>
+            <button className="p-3 rounded-full text-zinc-400 hover:text-orchid-400 hover:bg-white/5 transition-colors">
+              <span className="material-symbols-outlined">mic</span>
+            </button>
+            <button
+              className="luminescent-button rounded-full p-3 ml-2 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleSendMessage}
+              disabled={!input.trim()}
+            >
+              <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 1" }}>arrow_upward</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

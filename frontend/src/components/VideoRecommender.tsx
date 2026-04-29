@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Search, Video, ExternalLink, Sparkles } from 'lucide-react';
 import { API_BASE_URL } from '../config';
 
 interface VideoItem {
@@ -45,39 +44,35 @@ const VideoRecommender: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-6">
-      <h2 className="text-2xl font-bold text-white mb-6">Video Recommender</h2>
+    <div className="flex flex-col h-full p-8 max-w-6xl mx-auto overflow-y-auto w-full">
+      <h2 className="font-headline-lg text-headline-lg text-on-surface mb-8 text-center">Discovery Grid</h2>
 
       {/* Search bar */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 max-w-3xl">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              className="w-full bg-gray-800 text-white rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500/50 transition-shadow"
-              placeholder="Enter a topic you want to learn about..."
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-          </div>
+      <div className="mb-10 w-full max-w-3xl mx-auto">
+        <div className="glass-panel rounded-full p-2 pl-6 flex items-center shadow-[0_10px_40px_rgba(0,0,0,0.3)] border border-indigo-500/20 bg-zinc-950/60 transition-all hover:bg-zinc-950/80">
+          <span className="material-symbols-outlined text-zinc-400 mr-2">search</span>
+          <input
+            type="text"
+            className="flex-grow bg-transparent border-none text-on-surface font-body-md text-lg focus:ring-0 placeholder-zinc-500 outline-none py-3"
+            placeholder="What do you want to master today? e.g. Neural Networks"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
           <button
-            className={`px-5 py-3 rounded-xl ${
-              topic.trim() && !searching
-                ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-600/20'
-                : 'bg-gray-800 text-gray-500 cursor-not-allowed'
-            } transition-all duration-200 flex items-center gap-2 flex-shrink-0`}
+            className={`luminescent-button rounded-full py-3 px-8 ml-2 flex items-center justify-center font-label-md text-white transition-all duration-300 ${
+              (!topic.trim() || searching) ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02]'
+            }`}
             onClick={handleSearch}
             disabled={!topic.trim() || searching}
           >
             {searching ? (
               <>
-                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                Searching...
+                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                Searching
               </>
             ) : (
-              'Search'
+              'Discover'
             )}
           </button>
         </div>
@@ -85,69 +80,92 @@ const VideoRecommender: React.FC = () => {
 
       {/* Empty state */}
       {recommendations.length === 0 && !searching && (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center max-w-md">
-            <div className="relative inline-block mb-6">
-              <div className="w-20 h-20 rounded-2xl bg-purple-500/10 flex items-center justify-center">
-                <Video className="w-10 h-10 text-purple-400" />
+        <div className="flex-1 flex items-center justify-center py-12">
+          <div className="text-center max-w-lg">
+            <div className="relative inline-block mb-8">
+              <div className="w-24 h-24 rounded-full glass-panel flex items-center justify-center shadow-[0_0_40px_rgba(218,112,214,0.15)]">
+                <span className="material-symbols-outlined text-5xl text-orchid-400" style={{ fontVariationSettings: "'FILL' 1" }}>smart_display</span>
               </div>
-              <div className="absolute inset-0 w-20 h-20 rounded-2xl bg-purple-500/10 pulse-ring" />
+              <div className="absolute inset-0 w-24 h-24 rounded-full bg-orchid-400/10 pulse-ring" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Discover Learning Videos</h3>
-            <p className="text-gray-500 text-sm mb-4">
-              Enter any topic and get curated YouTube video recommendations matched to your learning needs.
+            <h3 className="font-headline-md text-xl text-on-surface mb-4">Curated Video Playlists</h3>
+            <p className="text-zinc-400 font-body-md mb-6 leading-relaxed">
+              Enter any topic and our AI will fetch the most highly-rated, relevant YouTube videos structured logically to accelerate your learning.
             </p>
-            <p className="text-gray-600 text-xs">
-              Try: <button onClick={() => setTopic('machine learning fundamentals')} className="text-indigo-400 hover:underline">machine learning fundamentals</button>
-              {' or '}
-              <button onClick={() => setTopic('neural networks')} className="text-indigo-400 hover:underline">neural networks</button>
-            </p>
+            <div className="flex gap-4 justify-center">
+              <button onClick={() => setTopic('machine learning fundamentals')} className="glass-panel px-4 py-2 rounded-full text-sm text-indigo-300 hover:bg-white/10 transition-colors">
+                Machine Learning
+              </button>
+              <button onClick={() => setTopic('organic chemistry')} className="glass-panel px-4 py-2 rounded-full text-sm text-orchid-300 hover:bg-white/10 transition-colors">
+                Organic Chemistry
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Results */}
       {recommendations.length > 0 && (
-        <div className="flex-1 overflow-y-auto">
-          <h3 className="text-lg font-semibold text-white mb-4">
-            Recommended Videos on "<span className="text-indigo-400">{searchedTopic}</span>"
+        <div className="flex-1 pb-12 w-full">
+          <h3 className="font-headline-md text-2xl text-white mb-8 text-center">
+            Curriculum for <span className="luminescent-text">"{searchedTopic}"</span>
           </h3>
 
-          <div className="space-y-4 max-w-4xl">
+          <div className="space-y-12">
             {recommendations.map((rec, recIndex) => (
-              <div key={`${rec.topic}-${rec.subtopic}-${recIndex}`} className="bg-gray-800 rounded-xl overflow-hidden animate-fadeIn">
-                <div className="px-4 py-3 border-b border-gray-700/50">
-                  <p className="text-sm font-medium text-white">{rec.subtopic}</p>
-                  <p className="text-xs text-gray-500">{rec.topic}</p>
+              <div key={`${rec.topic}-${rec.subtopic}-${recIndex}`} className="animate-fadeIn">
+                <div className="mb-6 flex items-center gap-4 px-2">
+                  <div className="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-indigo-400">
+                    <span className="material-symbols-outlined">library_books</span>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-on-surface">{rec.subtopic}</h4>
+                    <p className="text-zinc-400 text-sm">{rec.topic}</p>
+                  </div>
                 </div>
 
-                <div className="divide-y divide-gray-700/30">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {rec.videos.map((video, vidIndex) => (
-                    <div key={vidIndex} className="flex gap-4 p-4 hover:bg-gray-700/20 transition-colors">
-                      {video.thumbnail && (
-                        <img
-                          src={video.thumbnail}
-                          alt={video.title}
-                          className="w-32 h-20 object-cover rounded-lg flex-shrink-0"
-                        />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white mb-1 line-clamp-2">{video.title}</p>
-                        {video.description && (
-                          <p className="text-xs text-gray-400 line-clamp-2 mb-2">{video.description}</p>
+                    <a
+                      key={vidIndex}
+                      href={video.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="glass-card rounded-3xl p-4 flex flex-col group hover:-translate-y-2 transition-transform duration-300 block"
+                    >
+                      <div className="relative aspect-video rounded-2xl overflow-hidden mb-4 bg-zinc-900">
+                        {video.thumbnail ? (
+                          <img
+                            src={video.thumbnail}
+                            alt={video.title}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-zinc-600">
+                            <span className="material-symbols-outlined text-4xl">movie</span>
+                          </div>
                         )}
-                        <a
-                          href={video.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
-                        >
-                          <Sparkles size={12} />
-                          Watch on YouTube
-                          <ExternalLink size={11} />
-                        </a>
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px]">
+                          <div className="w-14 h-14 rounded-full bg-indigo-500/80 flex items-center justify-center text-white shadow-[0_0_20px_rgba(99,102,241,0.5)]">
+                            <span className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                      
+                      <div className="flex-1 flex flex-col">
+                        <h5 className="font-label-md text-on-surface text-base mb-2 line-clamp-2 group-hover:text-indigo-300 transition-colors">
+                          {video.title}
+                        </h5>
+                        <p className="font-body-md text-sm text-zinc-500 line-clamp-3 mb-4 flex-grow">
+                          {video.description}
+                        </p>
+                        
+                        <div className="flex items-center text-xs font-semibold text-indigo-400 mt-auto uppercase tracking-wide gap-1 group-hover:text-orchid-400 transition-colors">
+                          <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                          Watch Lesson
+                        </div>
+                      </div>
+                    </a>
                   ))}
                 </div>
               </div>

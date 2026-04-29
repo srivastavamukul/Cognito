@@ -9,7 +9,12 @@
 
 body {
   font-family: var(--font-sans);
-  @apply bg-gray-900 text-white;
+  background-color: #0A0908;
+  background-image: 
+      radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 85% 30%, rgba(218, 112, 214, 0.05) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: #e6e1df;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -20,17 +25,8 @@ html {
 
 /* ── Scrollbar ────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-gray-700 rounded-full;
-}
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-600;
+  width: 0px; /* Hide scrollbar for clean look */
+  background: transparent;
 }
 
 /* ── Fade-in animation ────────────────────────────── */
@@ -42,62 +38,65 @@ html {
   animation: fadeIn 0.3s both;
 }
 
-/* ── Landing page: gradient text ──────────────────── */
-@keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50%      { background-position: 100% 50%; }
-}
-.gradient-text {
-  background: linear-gradient(135deg, #818CF8, #A78BFA, #F472B6, #818CF8);
-  background-size: 300% 300%;
-  animation: gradientShift 6s ease infinite;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+/* ── Redesign Classes ──────────────────── */
 
-/* ── Landing page: floating orbs ──────────────────── */
-@keyframes float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33%      { transform: translate(30px, -40px) scale(1.05); }
-  66%      { transform: translate(-20px, 20px) scale(0.95); }
-}
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(100px);
-  animation: float 20s ease-in-out infinite;
-  pointer-events: none;
-}
-
-/* ── Landing page: grid background ────────────────── */
-.grid-pattern {
-  background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-  background-size: 64px 64px;
-}
-
-/* ── Landing page: glassmorphism card ─────────────── */
 .glass-card {
-  background: rgba(21, 25, 38, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background-color: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  transition: all 0.5s ease;
+}
+.glass-card:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.1);
 }
 
-/* ── Landing page: slide-up entrance ──────────────── */
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to   { opacity: 1; transform: translateY(0); }
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(40px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
 }
-.slide-up {
-  animation: slideUp 0.7s ease-out both;
+
+.luminescent-text {
+  background: linear-gradient(to right, #818cf8, #d8b4fe, #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 200% auto;
 }
-.slide-up-delay-1 { animation-delay: 0.1s; }
-.slide-up-delay-2 { animation-delay: 0.2s; }
-.slide-up-delay-3 { animation-delay: 0.3s; }
-.slide-up-delay-4 { animation-delay: 0.4s; }
+
+.luminescent-button {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(218, 112, 214, 0.8));
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+  transition: all 0.3s ease;
+}
+
+.luminescent-button:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 1), rgba(218, 112, 214, 1));
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+  letter-spacing: 0.05em;
+}
+
+.message-bubble-user {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(99, 102, 241, 0.05));
+  border-top: 1px solid rgba(99, 102, 241, 0.3);
+  border-left: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.message-bubble-ai {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
 
 /* ── Markdown rendering ───────────────────────────── */
 .markdown h1, .markdown h2, .markdown h3,

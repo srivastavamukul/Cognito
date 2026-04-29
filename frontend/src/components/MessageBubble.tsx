@@ -11,41 +11,26 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const isAI = message.role === 'assistant';
 
   return (
-    <div
-      className={`flex ${isAI ? 'justify-start' : 'justify-end'} animate-fadeIn`}
-    >
-      <div className={`flex items-start gap-3 ${isAI ? 'max-w-[85%]' : 'max-w-[75%]'}`}>
-        {isAI && (
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex-shrink-0 flex items-center justify-center mt-1">
-            <span className="text-white text-xs font-medium">C</span>
-          </div>
+    <div className={`flex gap-6 max-w-[85%] ${isAI ? 'self-start' : 'self-end flex-row-reverse'} animate-fadeIn w-full`}>
+      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-1 ${isAI ? 'glass-panel text-indigo-400' : 'border border-indigo-500/30'}`}>
+        {isAI ? (
+          <span className="material-symbols-outlined text-sm">auto_awesome</span>
+        ) : (
+          <span className="text-white text-xs font-medium">You</span>
         )}
+      </div>
 
-        <div
-          className={`rounded-2xl px-4 py-3 ${
-            isAI
-              ? 'bg-gray-800 text-gray-200'
-              : 'bg-indigo-600 text-white'
-          }`}
-        >
-          {isAI ? (
-            <div className="markdown text-sm leading-relaxed">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {message.content}
-              </ReactMarkdown>
-            </div>
-          ) : (
-            <div className="whitespace-pre-wrap text-sm">{message.content}</div>
-          )}
-          <div className={`text-xs mt-2 ${isAI ? 'text-gray-500' : 'text-indigo-200'}`}>
-            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      <div className={`glass-panel rounded-2xl p-6 backdrop-blur-[40px] ${isAI ? 'message-bubble-ai rounded-tl-sm' : 'message-bubble-user rounded-tr-sm'}`}>
+        {isAI ? (
+          <div className="markdown font-body-md text-body-md text-on-surface leading-relaxed">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {message.content}
+            </ReactMarkdown>
           </div>
-        </div>
-
-        {!isAI && (
-          <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center mt-1">
-            <span className="text-white text-xs font-medium">You</span>
-          </div>
+        ) : (
+          <p className="font-body-md text-body-md text-on-surface leading-relaxed whitespace-pre-wrap">
+            {message.content}
+          </p>
         )}
       </div>
     </div>

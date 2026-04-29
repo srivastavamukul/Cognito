@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Youtube, FileText, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { API_BASE_URL } from '../config';
 
@@ -59,67 +58,72 @@ const VideoSummarizer: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full p-6">
-      <h2 className="text-2xl font-bold text-white mb-6">Video Summarizer</h2>
+    <div className="flex flex-col h-full p-8 max-w-5xl mx-auto overflow-y-auto w-full">
+      <h2 className="font-headline-lg text-headline-lg text-on-surface mb-8 text-center">Video Summarizer</h2>
 
       {/* Input */}
-      <div className="mb-6 max-w-3xl">
-        <div className="relative mb-3">
-          <input
-            type="text"
-            className={`w-full bg-gray-800 text-white rounded-xl pl-10 pr-4 py-3 outline-none transition-shadow ${
-              error ? 'ring-2 ring-red-500/50' : 'focus:ring-2 focus:ring-indigo-500/50'
+      <div className="mb-10 w-full max-w-3xl mx-auto">
+        <div className="glass-panel rounded-3xl p-8 transition-all hover:bg-white/5 border border-white/5 shadow-[0_10px_40px_rgba(0,0,0,0.2)]">
+          <div className={`relative mb-6 flex items-center glass-card rounded-full p-2 pl-6 transition-all ${
+            error ? 'border-red-500/50 shadow-[0_0_20px_rgba(2ef,68,68,0.2)]' : 'border-indigo-500/20'
+          }`}>
+            <span className="material-symbols-outlined text-zinc-400 mr-2">movie</span>
+            <input
+              type="text"
+              className="flex-grow bg-transparent border-none text-on-surface font-body-md focus:ring-0 placeholder-zinc-500 outline-none py-2"
+              placeholder="Paste YouTube video URL here..."
+              value={videoUrl}
+              onChange={(e) => {
+                setVideoUrl(e.target.value);
+                setError('');
+              }}
+              onKeyDown={handleKeyDown}
+            />
+          </div>
+
+          {error && <p className="text-red-400 text-sm mb-6 text-center">{error}</p>}
+
+          <button
+            className={`w-full py-4 rounded-full font-label-md text-white transition-all duration-300 flex items-center justify-center gap-2 ${
+              videoUrl.trim() && !summarizing
+                ? 'luminescent-button hover:scale-[1.02]'
+                : 'bg-zinc-800/50 text-zinc-500 cursor-not-allowed border border-white/5'
             }`}
-            placeholder="Paste YouTube video URL..."
-            value={videoUrl}
-            onChange={(e) => {
-              setVideoUrl(e.target.value);
-              setError('');
-            }}
-            onKeyDown={handleKeyDown}
-          />
-          <Youtube className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-        </div>
+            onClick={handleSummarize}
+            disabled={!videoUrl.trim() || summarizing}
+          >
+            {summarizing ? (
+              <>
+                <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
+                Processing Video...
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-lg">auto_awesome</span>
+                Extract Key Concepts
+              </>
+            )}
+          </button>
 
-        {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
-
-        <button
-          className={`w-full px-4 py-3 rounded-xl ${
-            videoUrl.trim() && !summarizing
-              ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-600/20'
-              : 'bg-gray-800 text-gray-500 cursor-not-allowed'
-          } transition-all duration-200 flex items-center justify-center gap-2`}
-          onClick={handleSummarize}
-          disabled={!videoUrl.trim() || summarizing}
-        >
-          {summarizing ? (
-            <>
-              <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-              Generating Summary...
-            </>
-          ) : (
-            'Summarize Video'
+          {summarizing && (
+            <p className="text-indigo-300 text-xs text-center mt-4 animate-pulse">This may take 30-60 seconds depending on video length...</p>
           )}
-        </button>
-
-        {summarizing && (
-          <p className="text-gray-500 text-xs text-center mt-2">This may take 30-60 seconds depending on video length.</p>
-        )}
+        </div>
       </div>
 
       {/* Empty state */}
       {videoSummaries.length === 0 && !summarizing && (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center max-w-md">
-            <div className="relative inline-block mb-6">
-              <div className="w-20 h-20 rounded-2xl bg-rose-500/10 flex items-center justify-center">
-                <Youtube className="w-10 h-10 text-rose-400" />
+        <div className="flex-1 flex items-center justify-center py-10">
+          <div className="text-center max-w-lg">
+            <div className="relative inline-block mb-8">
+              <div className="w-24 h-24 rounded-full glass-panel flex items-center justify-center shadow-[0_0_40px_rgba(251,171,255,0.15)]">
+                <span className="material-symbols-outlined text-5xl text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>smart_display</span>
               </div>
-              <div className="absolute inset-0 w-20 h-20 rounded-2xl bg-rose-500/10 pulse-ring" />
+              <div className="absolute inset-0 w-24 h-24 rounded-full bg-secondary/10 pulse-ring" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Summarize Any YouTube Video</h3>
-            <p className="text-gray-500 text-sm">
-              Paste a YouTube URL above and get a concise, AI-generated summary. Study the key points without re-watching the whole video.
+            <h3 className="font-headline-md text-xl text-on-surface mb-3">Distill Long Lectures</h3>
+            <p className="text-zinc-400 font-body-md leading-relaxed">
+              Paste a YouTube URL and our AI will synthesize the core arguments, definitions, and formulas into an easily digestible study guide.
             </p>
           </div>
         </div>
@@ -127,55 +131,69 @@ const VideoSummarizer: React.FC = () => {
 
       {/* Results */}
       {videoSummaries.length > 0 && (
-        <div className="flex-1 overflow-y-auto">
-          <h3 className="text-lg font-semibold text-white mb-4">Video Summaries</h3>
+        <div className="flex-1 w-full pb-12">
+          <h3 className="font-headline-md text-2xl text-on-surface mb-8 text-center">Generated Summaries</h3>
 
-          <div className="space-y-6 max-w-4xl">
+          <div className="space-y-8 max-w-4xl mx-auto">
             {videoSummaries.map((summary) => {
               const videoId = getYoutubeVideoId(summary.videoUrl);
 
               return (
-                <div key={summary.id} className="bg-gray-800 rounded-xl p-4 animate-fadeIn">
-                  <div className="flex flex-col md:flex-row gap-4 mb-4">
+                <div key={summary.id} className="glass-card rounded-3xl p-6 md:p-8 animate-fadeIn hover:-translate-y-1 transition-transform duration-300">
+                  <div className="flex flex-col md:flex-row gap-6 mb-6 pb-6 border-b border-white/5">
                     {videoId && (
-                      <div className="md:w-1/3">
-                        <div className="aspect-video rounded-lg overflow-hidden">
+                      <div className="md:w-1/3 flex-shrink-0">
+                        <div className="aspect-video rounded-2xl overflow-hidden shadow-[0_5px_20px_rgba(0,0,0,0.3)] bg-zinc-900 relative group">
                           <img
                             src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
                             alt={summary.videoTitle || 'YouTube Thumbnail'}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
                             }}
                           />
+                          <a
+                            href={summary.videoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-[2px]"
+                          >
+                             <div className="w-12 h-12 rounded-full bg-rose-500/80 flex items-center justify-center text-white">
+                               <span className="material-symbols-outlined text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
+                             </div>
+                          </a>
                         </div>
                       </div>
                     )}
 
-                    <div className="md:w-2/3">
-                      <h4 className="text-lg font-semibold text-white">
+                    <div className="md:w-2/3 flex flex-col justify-center">
+                      <h4 className="font-headline-md text-xl text-on-surface mb-2">
                         {summary.videoTitle || 'Video Summary'}
                       </h4>
+                      <p className="text-zinc-500 text-sm font-body-md mb-4 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[16px]">schedule</span>
+                        {summary.timestamp.toLocaleString()}
+                      </p>
                       <a
                         href={summary.videoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-indigo-400 text-sm hover:underline mt-1 inline-block"
+                        className="inline-flex items-center gap-1.5 text-indigo-400 font-label-md text-sm hover:text-indigo-300 transition-colors"
                       >
-                        {summary.videoUrl}
+                        <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                        Open Original Video
                       </a>
-                      <p className="text-gray-500 text-sm mt-2">
-                        Summarized on {summary.timestamp.toLocaleString()}
-                      </p>
                     </div>
                   </div>
 
-                  <div className="bg-gray-900 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <FileText className="text-indigo-400" size={18} />
-                      <h5 className="text-white font-medium">Summary</h5>
+                  <div className="glass-panel rounded-2xl p-6 md:p-8">
+                    <div className="flex items-center gap-3 mb-6 border-b border-white/5 pb-4">
+                      <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                        <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
+                      </div>
+                      <h5 className="font-label-md text-lg text-white">Core Insights</h5>
                     </div>
-                    <div className="text-gray-300 whitespace-pre-wrap markdown text-sm leading-relaxed">
+                    <div className="text-zinc-300 whitespace-pre-wrap markdown font-body-md leading-relaxed text-sm">
                       {summary.summary}
                     </div>
                   </div>
