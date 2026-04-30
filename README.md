@@ -8,11 +8,11 @@ Cognito is an elite AI-powered study companion designed to transform the learnin
 
 ## 🎨 Design Philosophy
 
-The application utilizes a **Premium Dark** and **Glassmorphism** aesthetic:
-* 🌑 **Surfaces**: Deep Charcoal (#0F1117)
-* 🔮 **Accents**: Luminous Indigo-to-Purple gradients
-* 🪟 **Visuals**: Translucent glass-card layers with backdrop-blur
-* 🌊 **Animations**: Smooth slide-ups and floating gradient orbs
+The application utilizes a **Premium Solarpunk Dark** aesthetic:
+* 🌑 **Surfaces**: Deep Charcoal and Zinc with Glassmorphism effects
+* 🔮 **Accents**: Luminous Indigo-to-Orchid gradients
+* 🪟 **Visuals**: Translucent glass-card layers with backdrop-blur (40px)
+* 🌊 **Animations**: Framer Motion powered transitions and micro-interactions
 * 📐 **Typography**: Modern Inter typeface for maximum readability
 
 ## 📈 System Implementation Status
@@ -20,56 +20,37 @@ The application utilizes a **Premium Dark** and **Glassmorphism** aesthetic:
 ### ✅ Completed Phases
 * 🏗️ **Phase 1: Foundation** - Migration to a modern React + Vite + Tailwind CSS architecture.
 * 🔐 **Phase 2: Authentication** - Full Auth0 integration with protected routes and user profile management.
-* 💬 **Phase 3: Intelligence** - Llama 3.3 powered chat with session context and Markdown rendering.
-* 📊 **Phase 4: Analysis Engine** - CSV-based performance analyzer using Python for topic extraction.
-* 🎥 **Phase 5: Video Suite** - Automated YouTube recommendation and summarization pipelines.
-* 📱 **Phase 6: Accessibility** - Mobile-responsive layout with drawer navigation and accessibility optimizations.
+* 💬 **Phase 3: Intelligence** - Llama 3.3 powered chat with session context, Markdown rendering, and Export-to-Markdown.
+* 📊 **Phase 4: Analysis Engine** - Multer-based CSV performance analyzer with persistence and cross-tool navigation.
+* 🎥 **Phase 5: Video Suite** - Automated YouTube discovery and Gemini 1.5 Pro powered summarization.
+* 🌓 **Phase 6: Personalization** - Dark/Light theme engine with persistent state and collapsible sidebar.
+* 📱 **Phase 7: Accessibility** - Mobile-responsive layout, ARIA-optimized components, and keyboard shortcuts.
 
 ## ✨ Current Features
 
-* 💬 **AI Chat Tutor**: Conversational assistant with memory of previous messages. Supports code blocks, tables, and formatted explanations.
-* 📊 **Performance Analyzer**: Upload CSV test results to identify weak topics and receive study guidance.
-* 🎥 **Video Recommender**: Intelligent YouTube discovery based on specific learning topics and subtopics.
-* 📝 **Video Summarizer**: AI-generated lecture summaries from YouTube URLs to save study time.
-* 🌍 **Landing Page**: Professional entrance with animated sections and comprehensive onboarding.
-* 🔒 **Secure Auth**: Industry-standard login/signup and profile persistence via Auth0.
-
-## 📅 Future Development Roadmap
-
-### 🚀 Immediate Objectives
-* 💾 **Local Persistence**: Save chat history and analysis results to localStorage for session persistence.
-* 📤 **Study Export**: Capability to download AI explanations and video summaries as PDF/Markdown.
-* 🌗 **Theme Engine**: Toggle between the current dark mode and a high-fidelity light theme.
-
-### 🔭 Long Term Vision
-* 📅 **Study Scheduler**: Automated calendar generation based on identified weak topics.
-* 🤝 **Collaborative Study**: Shared workspaces for peer-to-peer learning and AI-moderated discussions.
-* 📱 **Native Experience**: Dedicated mobile application using React Native with offline support.
+* 💬 **AI Chat Tutor**: Conversational assistant with memory, Socratic questioning, and Markdown support.
+* 📊 **Performance Analyzer**: Upload CSV test results to identify weak topics. Now with "Recommend Videos" deep-linking.
+* 🎥 **Video Recommender**: Discovery Grid for YouTube content based on identified weak topics or manual search.
+* 📝 **Video Summarizer**: Extract key concepts and core insights from long lectures in seconds.
+* 💾 **Persistent State**: All your messages, analysis results, and summaries stay saved in your browser.
+* 🌗 **Theme Toggle**: Switch between the signature Dark mode and a high-fidelity Light mode.
+* ⌨️ **Power User Shortcuts**: `Ctrl+1-4` for navigation, `Ctrl+N` for new chat, and more.
 
 ## ⚙️ Technical Architecture
 
 ### 💻 Tech Stack
-* **Frontend**: React 18, Vite, Tailwind CSS, React Router
-* **Backend**: Node.js, Express
+* **Frontend**: React 18, Vite, Tailwind CSS, Framer Motion, Auth0
+* **Backend**: Node.js, Express, Multer
 * **AI Engines**: Together.ai (Llama 3.3), Google Gemini 1.5 Pro
-* **Auth**: Auth0
-* **Analysis**: Python (Pandas, Scikit-learn)
+* **Analysis**: Python 3 (Pandas, Scikit-learn)
 
 ### 📊 API Interface
-Cognito utilizes a centralized backend proxy to manage AI and analysis tasks:
-
 | Endpoint | Method | Description |
 | :--- | :--- | :--- |
 | `/api/chat` | `POST` | AI chat with session history context |
-| `/api/analyze` | `POST` | CSV processing for performance analysis |
+| `/api/analyze/upload` | `POST` | Multer-based CSV processing for performance analysis |
 | `/api/recommend` | `POST` | YouTube video discovery engine |
-| `/api/summarize` | `POST` | Transcript-based video summarization |
-
-## 📁 Project Structure
-
-* `/frontend`: The main React application (Vite, Tailwind, Auth0).
-* `/backend`: Node.js Express server and Python AI scripts.
-* `CHANGELOG.md`: Detailed history of every change and version update.
+| `/api/summarize` | `POST` | Gemini-powered video summarization |
 
 ## 🚀 Local Development
 
@@ -86,16 +67,18 @@ Cognito utilizes a centralized backend proxy to manage AI and analysis tasks:
    ```
 
 2. **Configure Environment Variables**:
-   Create a `.env` file in both `frontend` and `backend` directories based on the templates provided in the docs.
+   Create a `.env` file in `frontend/` and `backend/`.
+   - **Frontend**: `VITE_AUTH0_DOMAIN`, `VITE_AUTH0_CLIENT_ID`, `VITE_API_BASE_URL`
+   - **Backend**: `TOGETHER_API_KEY`, `GOOGLE_API_KEY`, `YOUTUBE_API_KEY`
 
 3. **Start the application**:
    ```bash
    # Terminal 1 (Backend)
-   node index.js
+   npm start
 
    # Terminal 2 (Frontend)
    npm run dev
    ```
 
 4. **Access the App**:
-   Navigate to `http://localhost:5173` (or the port shown in your terminal).
+   Navigate to `http://localhost:5173`.

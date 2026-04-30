@@ -1,43 +1,44 @@
 # Changelog
 
-- Project moved to `C:\Cognito`.
-- Dependencies checked (Node modules present, Python pip install pending workspace update).
-- Created `design.md` with full UI/UX and API specs.
-- Created `primary.md`, `memory.md`, `change.log.md` for project tracking.
-- Connected frontend to local backend (`http://localhost:3030`).
-- Built frontend (`npm run build`).
-- Created `.env` templates for backend and frontend.
+## [1.0.0] -- Production Release (2026-04-29)
 
-## v0.2.0 -- Full Feature Update
+### Added
+- **Theme Engine**: Complete Dark/Light mode support using CSS custom variables and persistent `localStorage` state.
+- **Collapsible Sidebar**: New icon-only state for a distraction-free "Focus Mode" workspace.
+- **Persistent State**: Full `localStorage` integration for all tools (Chat history, Analysis results, Video Recommendations, and Summaries).
+- **Chat Export**: Capability to download entire conversations as Markdown (.md) files for study review.
+- **Keyboard Shortcuts**: Power user controls (`Ctrl+1-4` for tool switching, `Ctrl+N` for new chat, `Esc` for mobile drawer).
+- **Actionable Insights**: "Recommend Videos" button in File Analyzer that deep-links to the Video Recommender with pre-filled topics.
+- **Enhanced Summarization**: Gemini-powered summarizer now fetches actual YouTube video titles via oEmbed for better organization.
+- **Accessibility (A11y)**: Full ARIA coverage with descriptive labels on all inputs and buttons.
+- **SEO/Branding**: Custom SVG favicon, apple-touch-icon, and OpenGraph/Twitter social sharing metadata.
+
+### Changed
+- **Performance Engine**: Replaced slow local BART summarization with high-speed **Google Gemini 1.5 Pro** API.
+- **Data Pipeline**: Removed Cloudinary dependency; switched to direct local `multer` uploads for CSV analysis.
+- **Backend Hardening**: Added `express-rate-limit` (30 req/min) and request body size limits (2MB).
+- **UX Refinement**: Implemented centered, max-width containers and fade-in transitions between all tools.
+- **Type Safety**: Centralized all TypeScript interfaces in `frontend/src/types/index.ts`.
+
+---
+
+## [0.2.0] -- Feature Implementation
 
 ### Added
 - **Landing page** with hero section, animated gradient orbs, features grid, about section, CTA, and footer.
-- **Login/Signup system** using Auth0: login and signup buttons on landing page navbar, protected dashboard route.
-- **About section** on landing page explaining what Cognito is, who it is for, and stat cards.
-- **Route protection** via `ProtectedRoute.tsx`. Unauthenticated users are redirected to landing page.
-- **User profile** in sidebar: shows Auth0 avatar, name, email, and logout button.
+- **Login/Signup system** using Auth0 integration and protected dashboard routes.
+- **User profile** in sidebar: shows Auth0 avatar, name, and email.
 - **Chat conversation context**: AI now remembers previous messages in the session (last 20).
-- **System prompt**: AI has a defined persona ("Cognito, an AI study assistant").
 - **Markdown rendering** in chat: AI responses render headers, bold, lists, code blocks, tables.
-- **New Chat button** to clear conversation and start fresh.
-- **Auto-expanding textarea** in chat input.
-- **Empty states** for File Analyzer, Video Recommender, and Video Summarizer with descriptions and example suggestions.
-- **Page transitions** (fade animation when switching tools).
-- **Mobile sidebar** with hamburger menu and overlay drawer.
-- **Centralized API config** (`config.ts` with `API_BASE_URL`).
-- **SEO meta tags** in `index.html` (description, OG tags, Inter font from Google Fonts).
+- **Empty states** for all tools with descriptions and example suggestions.
+- **Mobile responsiveness**: Hamburger menu and overlay drawer for smaller screens.
 - **Health check endpoint** (`GET /health`) on backend.
 
 ### Fixed
 - Backend env var mismatch (`SECRET_KEY` renamed to `TOGETHER_API_KEY`).
-- Python child processes now inherit env vars (YouTube API key, Google API key visible to scripts).
-- Video Recommender: fixed empty heading, fixed nested button inside anchor (invalid HTML), fixed data mapping to match actual API response shape.
-- Video Summarizer: tightened YouTube URL validation regex.
-- File Analyzer: restricted uploads to CSV only, added validation error message.
-- Backend CORS: removed duplicate manual headers, configured proper origin whitelist.
-- Backend: stderr from Python scripts treated as warnings, not fatal errors.
-- Removed redundant `bodyParser.json()` (Express 5 has it built in).
+- Video Recommender: fixed invalid HTML (nested button) and fixed data mapping.
+- Python child processes now correctly inherit environment variables.
+- Tightened YouTube URL validation regex.
 
 ### Removed
-- Removed `Login.tsx` (auth now handled by landing page and sidebar).
 - Removed static "Student Assistant" AI persona section from sidebar bottom.

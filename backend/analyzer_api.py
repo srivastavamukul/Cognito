@@ -5,26 +5,22 @@ import pandas as pd
 import requests
 import io
 import logging
-from analyser import analyze_student  # Ensure this function is implemented correctly
+from analyzer import analyze_student  # Ensure this function is implemented correctly
 
-# Log to stdout instead of stderr to avoid backend treating logs as errors
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+# Log to stderr to keep stdout clean for the JSON result
+logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 def main():
 
     if len(sys.argv) < 2:
-        print(json.dumps({'error': 'No URL provided'}))
+        print(json.dumps({'error': 'No file path provided'}))
         sys.exit(1)
 
-    url = sys.argv[1]
+    file_path = sys.argv[1]
 
     try:
-        # Download CSV
-        response = requests.get(url)
-        response.raise_for_status()
-
-        # Parse CSV
-        df = pd.read_csv(io.StringIO(response.text))
+        # Parse CSV directly from local file
+        df = pd.read_csv(file_path)
 
         # Analyze data
         weak_topics = analyze_student(df)

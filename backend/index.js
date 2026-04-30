@@ -4,8 +4,20 @@ const cors = require('cors');
 const { spawn } = require('child_process');
 const Together = require('together-ai');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
+const multer = require('multer');
+const fs = require('fs');
 
 const app = express();
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  message: { error: 'Too many requests, please try again later.' }
+});
+app.use(limiter);
+
+const upload = multer({ dest: 'uploads/' });
 
 // CORS -- whitelist local dev origins
 app.use(cors({
@@ -22,9 +34,7 @@ app.use(express.json({ limit: '2mb' }));
 
 // Together.ai client -- reads TOGETHER_API_KEY from env automatically,
 // or falls back to SECRET_KEY for backward compat.
-const together = new Together({
-  apiKey: process.env.TOGETHER_API_KEY || process.env.SECRET_KEY,
-});
+const together = new Together();
 
 const SYSTEM_PROMPT = `You are Cognito, an AI study assistant built to help students learn effectively. You explain concepts clearly, give examples, and adapt to the student's level. When appropriate, use markdown formatting (headers, bold, lists, code blocks) to structure your answers. Be concise but thorough.`;
 
@@ -72,14 +82,15 @@ app.post('/api/chat', async (req, res) => {
 });
 
 // ── File Analysis endpoint ──────────────────────────────
-app.post('/api/analyze', (req, res) => {
-  const { url } = req.body;
-  if (!url) {
-    return res.status(400).json({ error: 'No URL provided' });
+app.post('/api/analyze/upload', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
   }
 
+  const filePath = req.file.path;
   const analyzeFilePath = path.join(__dirname, 'analyzer_api.py');
-  const pythonProcess = spawn('python', [analyzeFilePath, url], {
+  
+  const pythonProcess = spawn('python', [analyzeFilePath, filePath], {
     env: { ...process.env },
   });
 
@@ -96,6 +107,11 @@ app.post('/api/analyze', (req, res) => {
 
   pythonProcess.on('close', (code) => {
     if (error) console.warn('Python stderr (analyze):', error);
+    
+    // Clean up file
+    fs.unlink(filePath, (err) => {
+      if (err) console.error('Failed to delete temp file:', err);
+    });
 
     if (code !== 0) {
       return res.status(500).json({ error: error || 'Failed to run analysis' });
@@ -104,9 +120,9 @@ app.post('/api/analyze', (req, res) => {
     try {
       const parsed = JSON.parse(result.trim());
       return res.json({
-        fileName: url.split('/').pop(),
-        fileType: 'text/csv',
-        fileSize: null,
+        fileName: req.file.originalname,
+        fileType: req.file.mimetype,
+        fileSize: req.file.size,
         analysis1: parsed.weak_topics,
       });
     } catch (e) {
@@ -135,6 +151,10 @@ app.post('/api/recommend', (req, res) => {
 
   py.on('close', (code) => {
     if (errOut) console.warn('Python stderr (recommend):', errOut);
+
+    if (code !== 0) {
+      return res.status(500).json({ error: 'Failed to run recommender' });
+    }
 
     try {
       const json = JSON.parse(out);
@@ -166,6 +186,10 @@ app.post('/api/summarize', (req, res) => {
 
   py.on('close', (code) => {
     if (errOut) console.warn('Python stderr (summarize):', errOut);
+
+    if (code !== 0) {
+      return res.status(500).json({ error: 'Summarizer process failed. Check your GOOGLE_API_KEY.' });
+    }
 
     try {
       const json = JSON.parse(out);

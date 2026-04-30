@@ -11,3 +11,5 @@ dist/
 **/node_modules
 .env
 .DS_Store
+backend/uploads/*
+!backend/uploads/.gitkeep
