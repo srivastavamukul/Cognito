@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { API_BASE_URL } from '../config';
+import { useToast } from '../context/ToastContext';
+import { VideoSummary } from '../types';
 
 const VideoSummarizer: React.FC = () => {
   const { videoSummaries, addVideoSummary } = useApp();
   const [videoUrl, setVideoUrl] = useState('');
   const [summarizing, setSummarizing] = useState(false);
   const [error, setError] = useState('');
+  const { addToast } = useToast();
 
   const isValidYoutubeUrl = (url: string): boolean => {
     const pattern = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]+/;
@@ -21,7 +24,9 @@ const VideoSummarizer: React.FC = () => {
 
   const handleSummarize = async () => {
     if (!isValidYoutubeUrl(videoUrl)) {
-      setError('Please enter a valid YouTube video URL (e.g. youtube.com/watch?v=... or youtu.be/...)');
+      const msg = 'Please enter a valid YouTube video URL (e.g. youtube.com/watch?v=... or youtu.be/...)';
+      setError(msg);
+      addToast(msg, 'warning');
       return;
     }
     setError('');
@@ -45,9 +50,12 @@ const VideoSummarizer: React.FC = () => {
       const videoId = getYoutubeVideoId(videoUrl);
       addVideoSummary(videoUrl, data.title || videoId || 'Video Summary', data.summary);
       setVideoUrl('');
+      addToast('Summary generated successfully!', 'success');
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Failed to summarize. Please try again.');
+      const msg = err.message || 'Failed to summarize. Please try again.';
+      setError(msg);
+      addToast(msg, 'error');
     } finally {
       setSummarizing(false);
     }
@@ -63,14 +71,15 @@ const VideoSummarizer: React.FC = () => {
 
       {/* Input */}
       <div className="mb-10 w-full max-w-3xl mx-auto">
-        <div className="glass-panel rounded-3xl p-8 transition-all hover:bg-white/5 border border-white/5 shadow-[0_10px_40px_rgba(0,0,0,0.2)]">
-          <div className={`relative mb-6 flex items-center glass-card rounded-full p-2 pl-6 transition-all ${
-            error ? 'border-red-500/50 shadow-[0_0_20px_rgba(2ef,68,68,0.2)]' : 'border-indigo-500/20'
+        <div className="glass-panel rounded-3xl border border-outline/70 p-8 shadow-[0_10px_40px_rgba(0,0,0,0.2)] transition-all hover:bg-surface-container-low/70">
+          <div className={`glass-card relative mb-6 flex items-center rounded-full p-2 pl-6 transition-all ${
+            error ? 'border border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.2)]' : 'border border-outline/70'
           }`}>
-            <span className="material-symbols-outlined text-zinc-400 mr-2">movie</span>
+            <span className="material-symbols-outlined mr-2 text-on-surface-variant">movie</span>
             <input
               type="text"
-              className="flex-grow bg-transparent border-none text-on-surface font-body-md focus:ring-0 placeholder-zinc-500 outline-none py-2"
+              className="flex-grow border-none bg-transparent py-2 font-body-md text-on-surface outline-none placeholder:text-on-surface-variant focus:ring-0"
+              aria-label="YouTube video URL"
               placeholder="Paste YouTube video URL here..."
               value={videoUrl}
               onChange={(e) => {
@@ -84,6 +93,7 @@ const VideoSummarizer: React.FC = () => {
           {error && <p className="text-red-400 text-sm mb-6 text-center">{error}</p>}
 
           <button
+            aria-label={summarizing ? 'Summarizing video' : 'Start video summarization'}
             className={`w-full py-4 rounded-full font-label-md text-white transition-all duration-300 flex items-center justify-center gap-2 ${
               videoUrl.trim() && !summarizing
                 ? 'luminescent-button hover:scale-[1.02]'
@@ -135,7 +145,7 @@ const VideoSummarizer: React.FC = () => {
           <h3 className="font-headline-md text-2xl text-on-surface mb-8 text-center">Generated Summaries</h3>
 
           <div className="space-y-8 max-w-4xl mx-auto">
-            {videoSummaries.map((summary) => {
+            {[...videoSummaries].reverse().map((summary: VideoSummary) => {
               const videoId = getYoutubeVideoId(summary.videoUrl);
 
               return (

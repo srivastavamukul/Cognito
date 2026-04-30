@@ -15,14 +15,14 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    <Auth0Provider
+    {/* <Auth0Provider
       domain={domain}
       clientId={clientId}
       authorizationParams={{
         redirect_uri: window.location.origin + '/dashboard',
       }}
-    >
+    > */}
       <App />
-    </Auth0Provider>
+    {/* </Auth0Provider> */}
   </StrictMode>
 );

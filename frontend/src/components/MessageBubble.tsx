@@ -12,15 +12,15 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
 
   return (
     <div className={`flex gap-6 max-w-[85%] ${isAI ? 'self-start' : 'self-end flex-row-reverse'} animate-fadeIn w-full`}>
-      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 mt-1 ${isAI ? 'glass-panel text-indigo-400' : 'border border-indigo-500/30'}`}>
+      <div className={`mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${isAI ? 'glass-panel bg-surface text-primary shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]' : 'border border-outline/70 bg-surface-container-low'}`}>
         {isAI ? (
           <span className="material-symbols-outlined text-sm">auto_awesome</span>
         ) : (
-          <span className="text-white text-xs font-medium">You</span>
+          <span className="text-on-surface text-xs font-medium">You</span>
         )}
       </div>
 
-      <div className={`glass-panel rounded-2xl p-6 backdrop-blur-[40px] ${isAI ? 'message-bubble-ai rounded-tl-sm' : 'message-bubble-user rounded-tr-sm'}`}>
+      <div className={`glass-panel rounded-2xl p-6 backdrop-blur-[40px] ${isAI ? 'message-bubble-ai rounded-tl-sm bg-surface shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)]' : 'message-bubble-user rounded-tr-sm bg-surface'}`}>
         {isAI ? (
           <div className="markdown font-body-md text-body-md text-on-surface leading-relaxed">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>

@@ -1,267 +1,248 @@
-import React, { useEffect } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
-import { useNavigate } from 'react-router-dom';
+// import { useAuth0 } from '@auth0/auth0-react';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-const LandingPage: React.FC = () => {
-  const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
+// Mock useAuth0 for testing without API
+const useAuth0 = () => {
   const navigate = useNavigate();
+  return {
+    isAuthenticated: false,
+    isLoading: false,
+    loginWithRedirect: () => navigate('/dashboard'),
+    logout: () => navigate('/'),
+  };
+};
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
+const featureCards = [
+  {
+    icon: 'psychology',
+    title: 'AI Brainstorm',
+    description: 'Socratic prompts, concept mapping, and study plans that keep your thinking in motion.',
+    accent: 'text-primary',
+  },
+  {
+    icon: 'description',
+    title: 'File Analyzer',
+    description: 'Upload your performance data and surface exactly where your attention should go next.',
+    accent: 'text-secondary',
+  },
+  {
+    icon: 'smart_display',
+    title: 'Video Summaries',
+    description: 'Turn long lectures into clean takeaways, timestamps, and revision-ready notes.',
+    accent: 'text-tertiary',
+  },
+];
 
-  const handleLogin = () => loginWithRedirect();
-  const handleSignup = () =>
-    loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } });
+const LandingPage: React.FC = () => {
+  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
 
   if (isLoading) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-[#0A0908]">
-        <div className="w-10 h-10 border-[3px] border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="h-10 w-10 animate-spin rounded-full border-[3px] border-primary border-t-transparent" />
       </div>
     );
   }
 
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-  };
+  // Commented out to allow access even if not "authenticated" by mock
+  // if (isAuthenticated) {
+  //   return <Navigate to="/dashboard" replace />;
+  // }
 
   return (
-    <div className="min-h-screen relative">
-      {/* Sticky Pill Navbar */}
-      <header className="bg-zinc-950/60 backdrop-blur-[40px] sticky top-6 z-50 mx-auto w-[calc(100%-2rem)] md:w-[calc(100%-4rem)] max-w-5xl rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
-        <div className="flex justify-between items-center w-full px-6 py-3">
-          <div className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-orchid-400 to-indigo-500 font-display-xl text-display-xl tracking-tight" style={{ fontSize: '1.5rem' }}>
-            Cognito
+    <div className="min-h-screen overflow-x-hidden bg-background text-on-background">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(128,131,255,0.18),transparent_25%),radial-gradient(circle_at_85%_18%,rgba(174,5,198,0.18),transparent_20%),radial-gradient(circle_at_50%_100%,rgba(0,154,218,0.1),transparent_30%)]" />
+
+      <header className="sticky top-0 z-[80] px-4 pt-4 md:px-6">
+        <div className="mx-auto max-w-6xl rounded-[30px] border border-outline/55 bg-surface/58 px-4 py-3 shadow-[0_18px_56px_rgba(0,0,0,0.18)] backdrop-blur-[26px] md:px-6">
+        <div className="flex items-center justify-between gap-6">
+          <div>
+            <p className="luminescent-text inline-block text-xl font-extrabold tracking-tight">
+              Cognito Premium
+            </p>
           </div>
-          <div className="flex items-center gap-6">
-            <nav className="hidden md:flex gap-8">
-              <a className="text-indigo-400 font-label-md text-label-md transition-all duration-300 hover:text-indigo-300" href="#home">Home</a>
-              <a className="text-zinc-400 font-label-md text-label-md transition-all duration-300 hover:text-indigo-300" href="#features">Features</a>
-              <a className="text-zinc-400 font-label-md text-label-md transition-all duration-300 hover:text-indigo-300" href="#about">About</a>
-            </nav>
-          </div>
-          <div className="flex items-center gap-4 text-indigo-400">
+
+          <nav className="hidden items-center gap-2 rounded-full border border-outline/45 bg-surface-container-low/55 px-2 py-1.5 md:flex">
+            <a className="rounded-full bg-surface-container px-4 py-2 text-sm font-medium text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]" href="#home">Home</a>
+            <a className="rounded-full px-4 py-2 text-sm text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface" href="#features">Features</a>
+            <a className="rounded-full px-4 py-2 text-sm text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface" href="#experience">Experience</a>
+          </nav>
+
+          <div className="flex items-center gap-3">
             <button
-              onClick={handleLogin}
-              className="text-zinc-400 font-label-md transition-all duration-300 hover:text-indigo-300"
+              onClick={() => loginWithRedirect({ appState: { returnTo: '/dashboard' } })}
+              className="rounded-full px-4 py-2 text-sm font-medium text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
             >
               Log In
             </button>
             <button
-              onClick={handleSignup}
-              className="transition-all duration-300 hover:text-indigo-300 flex items-center justify-center"
+              onClick={() =>
+                loginWithRedirect({
+                  appState: { returnTo: '/dashboard' },
+                  authorizationParams: { screen_hint: 'signup' },
+                })
+              }
+              className="rounded-full bg-theme-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(99,102,241,0.28)] transition-transform hover:scale-[1.02]"
             >
-              <span className="material-symbols-outlined">account_circle</span>
+              Start Free
             </button>
           </div>
         </div>
+        </div>
       </header>
 
-      {/* Main Content Canvas */}
-      <main className="max-w-7xl mx-auto px-container-padding flex flex-col gap-section-margin pt-16 pb-section-margin">
-        {/* Hero Section (Bento Grid Style) */}
-        <section className="grid grid-cols-1 md:grid-cols-12 gap-element-gap items-center min-h-[716px]" id="home">
-          {/* Hero Text */}
-          <motion.div 
-            initial="hidden" animate="visible" variants={fadeInUp}
-            className="md:col-span-7 flex flex-col gap-6 z-10"
+      <main className="relative z-10 mx-auto flex max-w-7xl flex-col gap-24 px-6 pb-24 pt-16 md:px-10">
+        <section id="home" className="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            className="space-y-8"
           >
-            <h1 className="font-display-xl text-display-xl text-on-surface leading-tight">
-              Elevate your study with <br/>
-              <span className="luminescent-text">Cognito</span>
-            </h1>
-            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
-              Your Solarpunk sanctuary for deep focus. AI-powered brainstorming, seamless file analysis, and intuitive video summaries in a distraction-free, floating environment.
-            </p>
-            <div className="mt-8 flex gap-4">
-              <button onClick={handleSignup} className="luminescent-button px-8 py-4 rounded-full font-label-md text-label-md text-white flex items-center gap-2 hover:scale-[1.02]">
-                Start Flow Session
-                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
+              Premium Study Sanctuary
+            </span>
+
+            <div className="space-y-5">
+              <h1 className="max-w-4xl text-5xl font-bold tracking-[-0.045em] text-on-surface md:text-7xl">
+                Deep work tools,
+                <span className="luminescent-text block">designed to feel calm.</span>
+              </h1>
+              <p className="max-w-2xl text-lg leading-8 text-on-surface-variant md:text-xl">
+                Cognito combines AI tutoring, data-driven study insights, video synthesis, and library workflows inside
+                a premium solarpunk interface built for long focus sessions.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-4">
+              <button
+                onClick={() => loginWithRedirect({ appState: { returnTo: '/dashboard' } })}
+                className="rounded-full bg-theme-gradient px-7 py-4 text-sm font-semibold text-white shadow-[0_18px_36px_rgba(99,102,241,0.28)] transition-transform hover:scale-[1.02]"
+              >
+                Enter Cognito
               </button>
-              <a href="#features" className="glass-card px-8 py-4 rounded-full font-label-md text-label-md text-on-surface flex items-center gap-2 hover:scale-[1.02]">
+              <a
+                href="#features"
+                className="rounded-full border border-outline/70 bg-surface-container-low/80 px-7 py-4 text-sm font-medium text-on-surface transition-colors hover:bg-surface-container"
+              >
                 Explore Features
               </a>
             </div>
           </motion.div>
 
-          {/* Hero Bento Visuals */}
-          <div className="md:col-span-5 grid grid-cols-2 grid-rows-2 gap-4 h-[500px] relative">
-            {/* Floating Orbs Background */}
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary-container rounded-full mix-blend-screen filter blur-[60px] opacity-30 animate-pulse"></div>
-            <div className="absolute bottom-10 -left-10 w-32 h-32 bg-secondary-container rounded-full mix-blend-screen filter blur-[50px] opacity-20"></div>
-
-            <motion.div 
-              initial="hidden" animate="visible" variants={fadeInUp} transition={{ delay: 0.2 }}
-              whileHover={{ scale: 1.02 }}
-              className="glass-card rounded-3xl row-span-2 col-span-1 p-6 flex flex-col justify-end overflow-hidden relative group"
-            >
-              <img alt="AI Brain" className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsUxl2DQDlu776Awy35kyrUpm5GviIHxyWzWqhbw9HJd9KL80NprruP20ua1_-GmNU4fchUwzox3gkjVPIMv9giuz_pAGnHEKE0U1hUBPU8nntMSBtKcjAW6_pWa2XJiz9_rDjEnQXzjCiG44lZQMrmnb-sVTxFZ_gLrcM5lBaNGtnUWQLzoGRK_0ZVyet-WFCVodCJpAd5flvvqcu1ux5AO9bDCFVvWAM-Z2BLr5sxXNz0_zulq4-mTVrqWGEhD6fi2AJPTFnyL49"/>
-              <div className="relative z-10 mt-auto">
-                <span className="material-symbols-outlined text-primary mb-2" style={{ fontVariationSettings: "'FILL' 1" }}>psychology</span>
-                <h3 className="font-headline-md text-headline-md text-on-surface" style={{ fontSize: '1.25rem' }}>AI Brainstorm</h3>
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+            className="grid h-[560px] gap-4 sm:grid-cols-2 sm:grid-rows-2"
+          >
+            <div className="glass-card relative row-span-2 overflow-hidden rounded-[34px] p-6">
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04),transparent_35%),url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80')] bg-cover bg-center opacity-45" />
+              <div className="relative z-10 flex h-full flex-col justify-between">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+                  <span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    psychology
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium uppercase tracking-[0.18em] text-on-surface-variant">Live Workspace</p>
+                  <h2 className="mt-3 text-2xl font-semibold tracking-tight text-on-surface">AI tutoring with context-aware study tools</h2>
+                </div>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div 
-              initial="hidden" animate="visible" variants={fadeInUp} transition={{ delay: 0.3 }}
-              whileHover={{ scale: 1.02 }}
-              className="glass-card rounded-3xl p-6 flex flex-col justify-center items-center text-center"
-            >
-              <div className="w-16 h-16 rounded-full border-2 border-primary-fixed/30 flex items-center justify-center mb-3">
-                <span className="material-symbols-outlined text-primary text-3xl">timer</span>
+            <div className="glass-card flex flex-col items-center justify-center rounded-[34px] p-6 text-center">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-secondary/25 bg-secondary/10 text-secondary">
+                <span className="material-symbols-outlined text-[30px]">insights</span>
               </div>
-              <span className="font-label-md text-label-md text-on-surface-variant">Focus Flow</span>
-              <span className="font-headline-lg text-headline-lg text-primary">25:00</span>
-            </motion.div>
+              <p className="text-sm uppercase tracking-[0.18em] text-on-surface-variant">Retention Tracking</p>
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-on-surface">88%</p>
+            </div>
 
-            <motion.div 
-              initial="hidden" animate="visible" variants={fadeInUp} transition={{ delay: 0.4 }}
-              whileHover={{ scale: 1.02 }}
-              className="glass-card rounded-3xl p-6 flex items-end relative overflow-hidden group"
-            >
-              <img alt="Data Flow" className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-opacity duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6W4DVq3vHfd7Xod-LutcJ44ZnN79XlU1gw_y1-JHOWp1Ra0E51_2SRGynDS3yIgHtxnobyNBI7_NybDf-ZwA6MSrpfLR_A7wDhqLgz3-t5KdpuWUHzzKYQxZ9MgfOPNB1rtPSWUj2fKu5gLu8Uw-Dg8wm784fovO2SlTmdvJwvYpUFb9hABQpUuvkTkbTUMifleiAxdI7zGhNd0zxsGrh36uEtZmyCLjjPazHgHiSliG2YLu_qq5fh2X_feE9FTB27QzWeFRioKV0"/>
-              <div className="relative z-10 w-full flex justify-between items-center">
-                <span className="font-label-md text-label-md text-on-surface">Library Sync</span>
+            <div className="glass-card relative overflow-hidden rounded-[34px] p-6">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(0,154,218,0.24),transparent_35%)]" />
+              <div className="relative z-10 flex h-full items-end justify-between">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.18em] text-on-surface-variant">Library Sync</p>
+                  <p className="mt-2 text-lg font-semibold tracking-tight text-on-surface">Back up and restore every learning artifact</p>
+                </div>
                 <span className="material-symbols-outlined text-secondary">sync</span>
               </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section className="flex flex-col gap-12 mt-16" id="features">
-          <motion.div 
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
-            className="text-center max-w-2xl mx-auto"
-          >
-            <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">Deep Learning Tools</h2>
-            <p className="font-body-md text-body-md text-on-surface-variant">Intuitive, AI-driven features designed to reduce friction and amplify your understanding.</p>
+            </div>
           </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-element-gap">
-            {/* Feature 1 */}
-            <motion.div 
-              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.1 }}
-              whileHover={{ scale: 1.02 }}
-              className="glass-card rounded-3xl p-8 flex flex-col gap-6 relative overflow-hidden group"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-primary/20"></div>
-              <span className="material-symbols-outlined text-4xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>forum</span>
-              <div>
-                <h3 className="font-headline-md text-headline-md text-on-surface mb-2" style={{ fontSize: '1.5rem' }}>Socratic Chat</h3>
-                <p className="font-body-md text-body-md text-on-surface-variant">Engage in dialogue that questions your assumptions and guides you to deeper comprehension.</p>
-              </div>
-            </motion.div>
-
-            {/* Feature 2 */}
-            <motion.div 
-              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }}
-              whileHover={{ scale: 1.02 }}
-              className="glass-card rounded-3xl p-8 flex flex-col gap-6 relative overflow-hidden group"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-secondary/20"></div>
-              <span className="material-symbols-outlined text-4xl text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>description</span>
-              <div>
-                <h3 className="font-headline-md text-headline-md text-on-surface mb-2" style={{ fontSize: '1.5rem' }}>File Analyzer</h3>
-                <p className="font-body-md text-body-md text-on-surface-variant">Upload PDFs or docs. Cognito extracts core concepts, definitions, and creates study guides instantly.</p>
-              </div>
-            </motion.div>
-
-            {/* Feature 3 */}
-            <motion.div 
-              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.3 }}
-              whileHover={{ scale: 1.02 }}
-              className="glass-card rounded-3xl p-8 flex flex-col gap-6 relative overflow-hidden group"
-            >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-tertiary/10 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-tertiary/20"></div>
-              <span className="material-symbols-outlined text-4xl text-tertiary" style={{ fontVariationSettings: "'FILL' 1" }}>smart_display</span>
-              <div>
-                <h3 className="font-headline-md text-headline-md text-on-surface mb-2" style={{ fontSize: '1.5rem' }}>Video Summarizer</h3>
-                <p className="font-body-md text-body-md text-on-surface-variant">Paste a lecture link. Get structured notes, key timestamps, and a tailored quiz in seconds.</p>
-              </div>
-            </motion.div>
-          </div>
         </section>
 
-        {/* About Section */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center mt-16" id="about">
-          <motion.div
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
-          >
-            <h2 className="font-headline-lg text-headline-lg text-on-surface mb-6">Designed for Deep Focus</h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant mb-6">
-              Cognito was born from the need to escape the noise of modern digital environments. We built a sanctuary that combines cutting-edge AI with a calm, solarpunk aesthetic, allowing your mind to enter a state of flow seamlessly.
+        <section id="features" className="space-y-10">
+          <div className="max-w-2xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Core System</p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-[-0.03em] text-on-surface">A premium toolkit for focused learning.</h2>
+            <p className="mt-4 text-lg leading-8 text-on-surface-variant">
+              The dark theme follows the Premium Study Assistant palette so every surface, accent, and interaction feels consistent from the first page to the deepest workspace.
             </p>
-            <p className="font-body-lg text-body-lg text-on-surface-variant">
-              Whether you're synthesizing complex research or preparing for exams, our tools adapt to your cognitive rhythm.
-            </p>
-          </motion.div>
+          </div>
 
-          <motion.div 
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }}
-            className="grid grid-cols-2 gap-6"
-          >
-            <div className="glass-card rounded-3xl p-8 flex flex-col justify-center items-center text-center">
-              <span className="font-display-xl text-primary mb-2 text-5xl">2M+</span>
-              <span className="font-label-md text-on-surface-variant">Hours of Flow</span>
-            </div>
-            <div className="glass-card rounded-3xl p-8 flex flex-col justify-center items-center text-center">
-              <span className="font-display-xl text-secondary mb-2 text-5xl">4.9</span>
-              <span className="font-label-md text-on-surface-variant">App Store Rating</span>
-            </div>
-            <div className="glass-card rounded-3xl p-8 col-span-2 flex flex-col justify-center items-center text-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-              <span className="font-headline-md text-on-surface mb-2 relative z-10 text-2xl">Backed by Cognitive Science</span>
-              <span className="font-body-md text-on-surface-variant relative z-10">Built with principles of spaced repetition and active recall.</span>
-            </div>
-          </motion.div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {featureCards.map((card) => (
+              <article key={card.title} className="glass-card rounded-[28px] p-8">
+                <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-surface-container-low ${card.accent}`}>
+                  <span className="material-symbols-outlined text-[26px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                    {card.icon}
+                  </span>
+                </div>
+                <h3 className="text-2xl font-semibold tracking-tight text-on-surface">{card.title}</h3>
+                <p className="mt-3 text-base leading-7 text-on-surface-variant">{card.description}</p>
+              </article>
+            ))}
+          </div>
         </section>
 
-        {/* CTA Banner Section */}
-        <motion.section 
-          initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
-          className="relative rounded-3xl overflow-hidden py-24 px-8 text-center flex flex-col items-center justify-center mt-16 glass-card border border-white/10"
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/40 via-transparent to-fuchsia-900/20 z-0"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary-container rounded-full mix-blend-screen filter blur-[120px] opacity-20 z-0 animate-pulse pointer-events-none"></div>
-          <div className="relative z-10 max-w-2xl mx-auto flex flex-col gap-8 items-center">
-            <h2 className="font-display-xl text-display-xl text-on-surface leading-tight text-5xl md:text-6xl">
-              Ready to enter your <br/>
-              <span className="luminescent-text">Flow State?</span>
-            </h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant">Join thousands of deep thinkers who have upgraded their study stack with Cognito.</p>
-            <button 
-              onClick={handleSignup}
-              className="luminescent-button px-10 py-5 rounded-full font-label-md text-label-md text-white flex items-center gap-2 mt-4 text-lg hover:scale-[1.02] transition-all"
-            >
-              Get Started for Free
-              <span className="material-symbols-outlined">rocket_launch</span>
-            </button>
+        <section id="experience" className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="glass-card rounded-[32px] p-8 md:p-10">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-secondary">Built for Flow</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-on-surface">From landing page to study session, the mood stays coherent.</h2>
+            <p className="mt-4 text-base leading-8 text-on-surface-variant">
+              Cognito's dark system leans on warm void surfaces, electric indigo action states, and orchid highlights, keeping the product calm and consistent from the landing page into the workspace.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                to="/dashboard"
+                onClick={(event) => {
+                  event.preventDefault();
+                  loginWithRedirect({ appState: { returnTo: '/dashboard' } });
+                }}
+                className="rounded-full bg-theme-gradient px-6 py-3 text-sm font-semibold text-white"
+              >
+                Continue to Dashboard
+              </Link>
+            </div>
           </div>
-        </motion.section>
+
+          <div className="glass-card rounded-[32px] p-8 md:p-10">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="rounded-[24px] border border-outline/60 bg-surface-container-low/70 p-5">
+                <p className="text-sm uppercase tracking-[0.18em] text-on-surface-variant">Analytics</p>
+                <p className="mt-3 text-4xl font-semibold tracking-tight text-on-surface">124</p>
+                <p className="mt-2 text-sm text-on-surface-variant">Concepts mastered and ready for spaced review.</p>
+              </div>
+              <div className="rounded-[24px] border border-outline/60 bg-surface-container-low/70 p-5">
+                <p className="text-sm uppercase tracking-[0.18em] text-on-surface-variant">Focus Library</p>
+                <p className="mt-3 text-4xl font-semibold tracking-tight text-on-surface">42h</p>
+                <p className="mt-2 text-sm text-on-surface-variant">Flow time restored to the Library workspace where it belongs.</p>
+              </div>
+              <div className="sm:col-span-2 rounded-[24px] border border-outline/60 bg-surface-container-low/70 p-5">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.18em] text-on-surface-variant">Study Signals</p>
+                    <p className="mt-2 text-xl font-semibold tracking-tight text-on-surface">A cohesive dark system across the entire product.</p>
+                  </div>
+                  <span className="material-symbols-outlined text-tertiary">query_stats</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
-
-      {/* Footer */}
-      <footer className="w-full py-16 border-t border-zinc-900 bg-zinc-950 mt-section-margin transition-opacity duration-700 ease-in-out">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-12 gap-8">
-          <div className="text-lg font-bold text-zinc-700 font-label-md text-label-md">
-            Cognito
-          </div>
-          <nav className="flex gap-6">
-            <a className="font-inter text-xs tracking-widest uppercase text-zinc-600 dark:text-zinc-700 hover:text-indigo-500 hover:tracking-[0.15em] transition-all duration-300" href="#">Knowledge Base</a>
-            <a className="font-inter text-xs tracking-widest uppercase text-zinc-600 dark:text-zinc-700 hover:text-indigo-500 hover:tracking-[0.15em] transition-all duration-300" href="#">Privacy Layer</a>
-            <a className="font-inter text-xs tracking-widest uppercase text-zinc-600 dark:text-zinc-700 hover:text-indigo-500 hover:tracking-[0.15em] transition-all duration-300" href="#">API Docs</a>
-          </nav>
-          <div className="font-inter text-xs tracking-widest uppercase text-zinc-600 dark:text-zinc-700">
-            © {new Date().getFullYear()} Cognito. Solarpunk study sanctuary.
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };
