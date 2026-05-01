@@ -1,22 +1,15 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-// import { useAuth0 } from '@auth0/auth0-react';
-// Mock useAuth0 for testing without API
-const useAuth0 = () => {
-  const navigate = useNavigate();
-  return {
-    user: { given_name: 'Test' },
-    logout: () => navigate('/'),
-  };
-};
-
+import { useUser, useClerk } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import AppShellHeader from '../components/AppShellHeader';
 
 const Dashboard: React.FC = () => {
-  const { user, logout } = useAuth0();
+  const { user } = useUser();
+  const { signOut } = useClerk();
+  const navigate = useNavigate();
   const {
     messages,
     analysisResults,
@@ -77,7 +70,7 @@ const Dashboard: React.FC = () => {
       <AppShellHeader
         subtitle="Unified Learning Dashboard"
         active="dashboard"
-        onLogout={() => logout({ logoutParams: { returnTo: window.location.origin } })}
+        onLogout={() => signOut({ redirectUrl: '/' })}
       />
 
       <main className="scrollbar-none relative z-10 mx-auto h-[calc(100vh-89px)] max-w-[1200px] overflow-y-auto px-6 pb-20 pt-10">
@@ -91,7 +84,7 @@ const Dashboard: React.FC = () => {
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(192,193,255,0.12),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(251,171,255,0.08),transparent_30%)]" />
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">Dashboard</p>
             <h1 className="mt-4 max-w-2xl text-4xl font-semibold tracking-[-0.03em] text-on-surface md:text-6xl">
-              Welcome back{user?.given_name ? `, ${user.given_name}` : ''}.
+              Welcome back{user?.firstName ? `, ${user.firstName}` : ''}.
             </h1>
             <p className="mt-4 max-w-2xl text-lg leading-8 text-on-surface-variant">
               This new top-level dashboard uses the Unified Landing Page template for logged-in users and keeps the spotlight on analytics, study momentum, and next actions.

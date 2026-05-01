@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
-// import { useAuth0 } from '@auth0/auth0-react';
-// Mock useAuth0 for testing without API
-const useAuth0 = () => ({
-  user: { given_name: 'Test' },
-  isAuthenticated: false,
-});
+import { useUser } from '@clerk/clerk-react';
 
 import Sidebar from '../components/Sidebar';
 import MainContent from '../components/MainContent';
@@ -15,7 +10,7 @@ import AppShellHeader from '../components/AppShellHeader';
 const Library: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const { user } = useAuth0();
+  const { user } = useUser();
 
   return (
     <div className="relative h-screen overflow-hidden text-on-surface">
@@ -44,7 +39,7 @@ const Library: React.FC = () => {
 
         <main role="main" aria-label="Library workspace" className="relative flex min-w-0 flex-1 flex-col overflow-hidden rounded-[34px] border border-outline/55 bg-surface/42 shadow-[0_24px_70px_rgba(0,0,0,0.14)] backdrop-blur-[24px]">
           <AppShellHeader
-            subtitle={user?.given_name ? `${user.given_name}'s Library` : 'Your Library'}
+            subtitle={user?.firstName ? `${user.firstName}'s Library` : 'Your Library'}
             active="library"
             onLogout={() => {
               window.location.href = '/';

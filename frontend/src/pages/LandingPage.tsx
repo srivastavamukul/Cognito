@@ -1,17 +1,7 @@
-// import { useAuth0 } from '@auth0/auth0-react';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-
-// Mock useAuth0 for testing without API
-const useAuth0 = () => {
-  const navigate = useNavigate();
-  return {
-    isAuthenticated: false,
-    isLoading: false,
-    loginWithRedirect: () => navigate('/dashboard'),
-    logout: () => navigate('/'),
-  };
-};
+import { useUser, useClerk } from '@clerk/clerk-react';
 
 const featureCards = [
   {
@@ -35,9 +25,11 @@ const featureCards = [
 ];
 
 const LandingPage: React.FC = () => {
-  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+  const { user, isLoaded } = useUser();
+  const { openSignIn, openSignUp } = useClerk();
+  const navigate = useNavigate();
 
-  if (isLoading) {
+  if (!isLoaded) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="h-10 w-10 animate-spin rounded-full border-[3px] border-primary border-t-transparent" />
@@ -45,10 +37,9 @@ const LandingPage: React.FC = () => {
     );
   }
 
-  // Commented out to allow access even if not "authenticated" by mock
-  // if (isAuthenticated) {
-  //   return <Navigate to="/dashboard" replace />;
-  // }
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-on-background">
@@ -71,18 +62,13 @@ const LandingPage: React.FC = () => {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => loginWithRedirect({ appState: { returnTo: '/dashboard' } })}
+              onClick={() => openSignIn({ forceRedirectUrl: '/dashboard' })}
               className="rounded-full px-4 py-2 text-sm font-medium text-on-surface-variant transition-colors hover:bg-surface-container hover:text-on-surface"
             >
               Log In
             </button>
             <button
-              onClick={() =>
-                loginWithRedirect({
-                  appState: { returnTo: '/dashboard' },
-                  authorizationParams: { screen_hint: 'signup' },
-                })
-              }
+              onClick={() => openSignUp({ forceRedirectUrl: '/dashboard' })}
               className="rounded-full bg-theme-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(99,102,241,0.28)] transition-transform hover:scale-[1.02]"
             >
               Start Free
@@ -117,7 +103,7 @@ const LandingPage: React.FC = () => {
 
             <div className="flex flex-wrap gap-4">
               <button
-                onClick={() => loginWithRedirect({ appState: { returnTo: '/dashboard' } })}
+                onClick={() => openSignIn({ forceRedirectUrl: '/dashboard' })}
                 className="rounded-full bg-theme-gradient px-7 py-4 text-sm font-semibold text-white shadow-[0_18px_36px_rgba(99,102,241,0.28)] transition-transform hover:scale-[1.02]"
               >
                 Enter Cognito
@@ -205,16 +191,12 @@ const LandingPage: React.FC = () => {
               Cognito's dark system leans on warm void surfaces, electric indigo action states, and orchid highlights, keeping the product calm and consistent from the landing page into the workspace.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/dashboard"
-                onClick={(event) => {
-                  event.preventDefault();
-                  loginWithRedirect({ appState: { returnTo: '/dashboard' } });
-                }}
+              <button
+                onClick={() => openSignIn({ forceRedirectUrl: '/dashboard' })}
                 className="rounded-full bg-theme-gradient px-6 py-3 text-sm font-semibold text-white"
               >
                 Continue to Dashboard
-              </Link>
+              </button>
             </div>
           </div>
 

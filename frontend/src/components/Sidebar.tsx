@@ -1,14 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-// import { useAuth0 } from '@auth0/auth0-react';
-
-// Mock useAuth0 for testing without API
-const useAuth0 = () => ({
-  isAuthenticated: false,
-  user: null,
-  logout: ({ logoutParams }: any) => { console.log('Logout called', logoutParams); },
-  loginWithRedirect: () => { console.log('Login called'); }
-});
+import { useUser, useClerk } from '@clerk/clerk-react';
 
 import { ToolType } from '../types';
 
@@ -52,15 +44,12 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onToggleCollapse }) => {
   const { activeTool, setActiveTool } = useApp();
-  const { user: auth0User, isAuthenticated } = useAuth0();
+  const { user, isLoaded } = useUser();
+  const { signOut } = useClerk();
 
-  // Mock user for testing when not authenticated
-  const user = isAuthenticated ? auth0User : {
-    name: 'Test Student',
-    email: 'test@cognito.ai',
-    picture: null
-  };
-  const showProfile = true; // Always show profile for testing
+  if (!isLoaded) return null;
+
+  const showProfile = !!user;
 
   const handleToolChange = (tool: ToolType) => {
     setActiveTool(tool);
@@ -89,30 +78,46 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, collapsed = false, onTogg
 
       {/* User Profile Block (3.4) */}
       {showProfile && !collapsed && (
-        <div className="glass-card mb-6 flex items-center gap-4 rounded-[24px] p-4">
-          {user.picture ? (
-            <img src={user.picture} alt={user.name || 'User'} className="w-10 h-10 rounded-full object-cover border border-indigo-500/30 flex-shrink-0" />
-          ) : (
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-container text-on-surface">
-              <span className="text-white font-bold text-sm">{(user.name || user.email || 'U').charAt(0).toUpperCase()}</span>
+        <div className="glass-card mb-6 flex flex-col gap-3 rounded-[24px] p-4">
+          <div className="flex items-center gap-4">
+            {user.imageUrl ? (
+              <img src={user.imageUrl} alt={user.fullName || 'User'} className="w-10 h-10 rounded-full object-cover border border-indigo-500/30 flex-shrink-0" />
+            ) : (
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary-container text-on-surface">
+                <span className="text-white font-bold text-sm">{(user.fullName || user.primaryEmailAddress?.emailAddress || 'U').charAt(0).toUpperCase()}</span>
+              </div>
+            )}
+            <div className="flex-1 min-w-0 overflow-hidden text-left">
+              <h3 className="truncate text-sm font-semibold text-on-surface">{user.fullName || 'Student'}</h3>
+              <p className="truncate text-xs text-on-surface-variant">{user.primaryEmailAddress?.emailAddress}</p>
             </div>
-          )}
-          <div className="flex-1 min-w-0 overflow-hidden text-left">
-            <h3 className="truncate text-sm font-semibold text-on-surface">{user.name || 'Student'}</h3>
-            <p className="truncate text-xs text-on-surface-variant">{user.email}</p>
           </div>
+          <button
+            onClick={() => signOut()}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-error/10 py-2 text-xs font-medium text-error transition-colors hover:bg-error/20"
+          >
+            <span className="material-symbols-outlined text-[18px]">logout</span>
+            Logout
+          </button>
         </div>
       )}
       {/* Collapsed: show avatar only */}
       {showProfile && collapsed && (
-        <div className="mb-4 flex justify-center">
-          {user.picture ? (
-            <img src={user.picture} alt={user.name || 'User'} className="w-10 h-10 rounded-full object-cover border border-indigo-500/30" />
+        <div className="mb-4 flex flex-col items-center gap-2">
+          {user.imageUrl ? (
+            <img src={user.imageUrl} alt={user.fullName || 'User'} className="w-10 h-10 rounded-full object-cover border border-indigo-500/30" />
           ) : (
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-container text-on-surface">
-              <span className="text-on-surface font-bold text-sm">{(user.name || user.email || 'U').charAt(0).toUpperCase()}</span>
+              <span className="text-on-surface font-bold text-sm">{(user.fullName || user.primaryEmailAddress?.emailAddress || 'U').charAt(0).toUpperCase()}</span>
             </div>
           )}
+          <button
+            onClick={() => signOut()}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-error/10 text-error hover:bg-error/20"
+            title="Logout"
+          >
+            <span className="material-symbols-outlined text-[16px]">logout</span>
+          </button>
         </div>
       )}
 

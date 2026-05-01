@@ -9,15 +9,15 @@ import Dashboard from './pages/Dashboard';
 import Library from './pages/Library';
 import FocusPopup from './pages/FocusPopup';
 
-// const AuthenticatedLayout: React.FC = () => (
-//   <ProtectedRoute>
-//     <ToastProvider>
-//       <AppProvider>
-//         <Outlet />
-//       </AppProvider>
-//     </ToastProvider>
-//   </ProtectedRoute>
-// );
+const AuthenticatedLayout: React.FC = () => (
+  <ProtectedRoute>
+    <ToastProvider>
+      <AppProvider>
+        <Outlet />
+      </AppProvider>
+    </ToastProvider>
+  </ProtectedRoute>
+);
 
 const routeOrder: Record<string, number> = {
   '/dashboard': 0,
@@ -65,8 +65,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        {/* <Route element={<AuthenticatedLayout />}> */}
-        <Route element={<TestLayout />}>
+        <Route element={<AuthenticatedLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/library" element={<Library />} />
           <Route path="/focus-popup" element={<FocusPopup />} />

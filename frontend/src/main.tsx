@@ -2,10 +2,13 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
-import { Auth0Provider } from '@auth0/auth0-react';
+import { ClerkProvider } from '@clerk/clerk-react';
 
-const domain = import.meta.env.VITE_AUTH0_DOMAIN || 'dev-q42vneml3qho4xpf.us.auth0.com';
-const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID || '0cUXfIspLNeFB1n7ChCwemjzdLo9jXSI';
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error('Missing Publishable Key');
+}
 
 const container = document.getElementById('root');
 
@@ -15,14 +18,8 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    {/* <Auth0Provider
-      domain={domain}
-      clientId={clientId}
-      authorizationParams={{
-        redirect_uri: window.location.origin + '/dashboard',
-      }}
-    > */}
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
       <App />
-    {/* </Auth0Provider> */}
+    </ClerkProvider>
   </StrictMode>
 );
