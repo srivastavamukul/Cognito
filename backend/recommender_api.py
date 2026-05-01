@@ -4,6 +4,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from googleapiclient.discovery import build
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # load your dataset
 df = pd.read_csv(os.path.join(os.path.dirname(__file__), 'ai.csv'))
@@ -12,7 +15,12 @@ df['Subtopic'] = df['Subtopic'].fillna('')
 vectorizer = TfidfVectorizer(stop_words='english')
 tfidf_matrix = vectorizer.fit_transform(df['Subtopic'])
 
-youtube = build('youtube', 'v3', developerKey=os.getenv('YOUTUBE_API_KEY'))
+YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
+if not YOUTUBE_API_KEY:
+    print(json.dumps({'error': 'YOUTUBE_API_KEY not found in environment'}))
+    sys.exit(1)
+
+youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
 def search_youtube(query, max_results=3):
     req = youtube.search().list(q=query, part='snippet', type='video', maxResults=max_results)

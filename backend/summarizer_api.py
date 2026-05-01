@@ -21,8 +21,19 @@ def extract_video_id(youtube_url):
     return None
 
 def extract_transcript(video_id):
-    transcript_text = YouTubeTranscriptApi.get_transcript(video_id)
-    transcript = " ".join([i["text"] for i in transcript_text])
+    api = YouTubeTranscriptApi()
+    try:
+        # Try to get the transcript directly if possible
+        transcript_text = api.get_transcript(video_id)
+    except (AttributeError, Exception):
+        # Fallback to list() and fetch() which seems to be the API for this version
+        transcript_list = api.list(video_id)
+        transcript_text = transcript_list.find_transcript(['en']).fetch()
+            
+    try:
+        transcript = " ".join([i["text"] for i in transcript_text])
+    except (TypeError, KeyError):
+        transcript = " ".join([i.text for i in transcript_text])
     return transcript
 
 def generate_summary(transcript_text):
@@ -30,7 +41,7 @@ def generate_summary(transcript_text):
         "This is a YouTube video summarizer. It will take the transcript text and summarize "
         "the entire video, providing the important points in 500 words. Transcript: "
     )
-    model = genai.GenerativeModel("models/gemini-1.5-pro")
+    model = genai.GenerativeModel("models/gemini-flash-latest")
     response = model.generate_content(prompt + transcript_text)
     return response.text
 

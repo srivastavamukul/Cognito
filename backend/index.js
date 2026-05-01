@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { spawn } = require('child_process');
-const Together = require('together-ai');
+
 const path = require('path');
 const rateLimit = require('express-rate-limit');
 const multer = require('multer');
@@ -32,9 +32,18 @@ app.use(cors({
 
 app.use(express.json({ limit: '2mb' }));
 
-// Together.ai client -- reads TOGETHER_API_KEY from env automatically,
-// or falls back to SECRET_KEY for backward compat.
-const together = new Together();
+
+const Groq = require('groq-sdk');
+
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
+
+if (!GROQ_API_KEY) {
+  console.error('CRITICAL: GROQ_API_KEY is not defined in .env');
+} else {
+  console.log(`Groq API Key loaded: ${GROQ_API_KEY.substring(0, 7)}...`);
+}
+
+const groq = new Groq({ apiKey: GROQ_API_KEY });
 
 const SYSTEM_PROMPT = `You are Cognito, an AI study assistant built to help students learn effectively. You explain concepts clearly, give examples, and adapt to the student's level. When appropriate, use markdown formatting (headers, bold, lists, code blocks) to structure your answers. Be concise but thorough.`;
 
@@ -47,20 +56,18 @@ app.get('/', (req, res) => {
   res.send('Cognito backend is running.');
 });
 
-// ── Chat endpoint (Together.ai) ─────────────────────────
+// ── Chat endpoint (Groq) ─────────────────────────
 app.post('/api/chat', async (req, res) => {
   try {
     // Support both old format { message } and new format { messages }
     let conversationMessages;
 
     if (req.body.messages && Array.isArray(req.body.messages)) {
-      // New format: full conversation history
       conversationMessages = [
         { role: 'system', content: SYSTEM_PROMPT },
         ...req.body.messages,
       ];
     } else if (req.body.message) {
-      // Old format: single message (backward compat)
       conversationMessages = [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: req.body.message },
@@ -69,15 +76,26 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: 'No message provided' });
     }
 
-    const response = await together.chat.completions.create({
-      model: 'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free',
-      messages: conversationMessages,
-    });
+    console.log('Incoming Chat Request Body:', JSON.stringify(req.body, null, 2));
 
-    res.json({ reply: response.choices[0].message.content });
+    const chatCompletion = await groq.chat.completions.create({
+      messages: conversationMessages,
+      model: 'llama-3.3-70b-versatile',
+    });
+    
+    const reply = chatCompletion.choices[0]?.message?.content;
+
+    if (!reply) {
+      throw new Error('Groq API returned no content');
+    }
+
+    res.json({ reply });
   } catch (err) {
-    console.error('Chat error:', err.message);
-    res.status(500).json({ error: 'Chat failed. Check your API key.' });
+    console.error('Chat error full details:', err);
+    res.status(500).json({ 
+      error: `Chat failed: ${err.message}`,
+      details: err.response?.data || err.stack 
+    });
   }
 });
 
@@ -205,4 +223,20 @@ app.post('/api/summarize', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3030;
-app.listen(PORT, () => console.log(`Cognito backend listening on port ${PORT}`));
+const server = app.listen(PORT, () => console.log(`Cognito backend listening on port ${PORT}`));
+
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('UNHANDLED REJECTION:', reason);
+});
+
+process.on('exit', (code) => {
+  console.log(`Process exited with code: ${code}`);
+});
+
+// Keep-alive to prevent event loop from emptying
+setInterval(() => {}, 1000 * 60 * 60);
