@@ -11,6 +11,11 @@ export interface Message {
   content: string;
   role: 'user' | 'assistant';
   timestamp: Date;
+  attachment?: {
+    url: string;
+    type: 'image' | 'file';
+    name: string;
+  };
 }
 
 export interface AnalysisResult {

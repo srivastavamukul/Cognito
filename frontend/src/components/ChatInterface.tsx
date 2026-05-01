@@ -4,6 +4,7 @@ import MessageBubble from './MessageBubble';
 import { API_BASE_URL } from '../config';
 import { useToast } from '../context/ToastContext';
 import { Message } from '../types';
+import { uploadToCloudinary } from '../utils/cloudinary';
 
 const ChatInterface: React.FC = () => {
   const { messages, addMessage, clearMessages, isTyping, setIsTyping } = useApp();
@@ -12,6 +13,8 @@ const ChatInterface: React.FC = () => {
   const [brainstormMode, setBrainstormMode] = useState<'clarity' | 'challenge' | 'planner' | 'analogies'>('clarity');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const modePromptMap = {
     clarity: 'Respond with plain language and prioritize conceptual clarity.',
@@ -31,12 +34,15 @@ const ChatInterface: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  const handleSendMessage = async () => {
-    if (!input.trim()) return;
+  const handleSendMessage = async (attachment?: Message['attachment']) => {
+    if (!input.trim() && !attachment) return;
 
     const userMessage = input.trim();
-    const enrichedUserMessage = `${userMessage}\n\n[Brainstorm mode: ${modePromptMap[brainstormMode]}]`;
-    addMessage(userMessage, 'user');
+    const enrichedUserMessage = userMessage 
+      ? `${userMessage}\n\n[Brainstorm mode: ${modePromptMap[brainstormMode]}]`
+      : `[Uploaded ${attachment?.type || 'file'}: ${attachment?.name || 'attachment'}] [Brainstorm mode: ${modePromptMap[brainstormMode]}]`;
+    
+    addMessage(userMessage || `Sent an ${attachment?.type || 'attachment'}`, 'user', attachment);
     setInput('');
     setIsTyping(true);
 
@@ -44,7 +50,13 @@ const ChatInterface: React.FC = () => {
       .filter(m => m.id !== 'welcome')
       .slice(-20)
       .map(m => ({ role: m.role, content: m.content }));
-    conversationHistory.push({ role: 'user', content: enrichedUserMessage });
+    
+    let contentWithAttachment = enrichedUserMessage;
+    if (attachment) {
+      contentWithAttachment += `\n\n(Attachment: ${attachment.url})`;
+    }
+    
+    conversationHistory.push({ role: 'user', content: contentWithAttachment });
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/chat`, {
@@ -60,6 +72,30 @@ const ChatInterface: React.FC = () => {
       addToast('Failed to connect to AI server', 'error');
     } finally {
       setIsTyping(false);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    addToast('Uploading to Cloudinary...', 'info');
+
+    try {
+      const result = await uploadToCloudinary(file, 'chat_attachments');
+      const attachment: Message['attachment'] = {
+        url: result.secure_url,
+        type: file.type.startsWith('image/') ? 'image' : 'file',
+        name: file.name,
+      };
+      addToast('File uploaded successfully!', 'success');
+      handleSendMessage(attachment);
+    } catch (error: any) {
+      addToast(error.message || 'Upload failed', 'error');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -180,12 +216,20 @@ const ChatInterface: React.FC = () => {
             onKeyDown={handleKeyDown}
           />
           <div className="flex items-center gap-2 pr-2">
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleFileChange}
+              accept="image/*,.pdf,.doc,.docx,.txt"
+            />
             <button
-              onClick={() => addToast('File attachment coming soon!', 'info')}
-              className="rounded-full p-3 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className={`rounded-full p-3 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary ${isUploading ? 'animate-pulse' : ''}`}
               aria-label="Attach file"
             >
-              <span className="material-symbols-outlined">attach_file</span>
+              <span className="material-symbols-outlined">{isUploading ? 'sync' : 'attach_file'}</span>
             </button>
             <button
               onClick={() => addToast('Voice input coming soon!', 'info')}

@@ -28,9 +28,32 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
             </ReactMarkdown>
           </div>
         ) : (
-          <p className="font-body-md text-body-md text-on-surface leading-relaxed whitespace-pre-wrap">
-            {message.content}
-          </p>
+          <div className="flex flex-col gap-3">
+            <p className="font-body-md text-body-md text-on-surface leading-relaxed whitespace-pre-wrap">
+              {message.content}
+            </p>
+            {message.attachment && (
+              <div className="mt-2 rounded-lg overflow-hidden border border-outline/30 bg-surface-container-high/20">
+                {message.attachment.type === 'image' ? (
+                  <img 
+                    src={message.attachment.url} 
+                    alt={message.attachment.name} 
+                    className="max-w-full h-auto object-cover max-h-60 rounded-md"
+                  />
+                ) : (
+                  <a 
+                    href={message.attachment.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 p-3 text-sm text-primary hover:underline"
+                  >
+                    <span className="material-symbols-outlined text-sm">description</span>
+                    {message.attachment.name}
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>
